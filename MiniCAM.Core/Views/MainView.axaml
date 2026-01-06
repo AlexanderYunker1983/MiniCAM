@@ -47,7 +47,7 @@
           </Border>
         </TabItem>
         <!-- Pocket operations tab -->
-        <TabItem>
+        <TabItem IsEnabled="False">
           <TabItem.Header>
             <TextBlock Text="{Binding RibbonTabPocketText}"
                        FontSize="{StaticResource RibbonTabHeaderFontSize}" />
@@ -61,7 +61,7 @@
           </Border>
         </TabItem>
         <!-- Profile operations tab -->
-        <TabItem>
+        <TabItem IsEnabled="False">
           <TabItem.Header>
             <TextBlock Text="{Binding RibbonTabProfileText}"
                        FontSize="{StaticResource RibbonTabHeaderFontSize}" />
@@ -75,7 +75,7 @@
           </Border>
         </TabItem>
         <!-- Other operations tab -->
-        <TabItem>
+        <TabItem IsEnabled="False">
           <TabItem.Header>
             <TextBlock Text="{Binding RibbonTabOtherText}"
                        FontSize="{StaticResource RibbonTabHeaderFontSize}" />

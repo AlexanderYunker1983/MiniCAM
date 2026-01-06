@@ -132,6 +132,9 @@
   <data name="MenuApplicationSettings" xml:space="preserve">
     <value>Настройки приложения</value>
   </data>
+  <data name="MenuCodeGenerationSettings" xml:space="preserve">
+    <value>Настройки генерации кода</value>
+  </data>
   <data name="RibbonTabDrilling" xml:space="preserve">
     <value>Сверление</value>
   </data>
@@ -176,5 +179,140 @@
   </data>
   <data name="ThemeDark" xml:space="preserve">
     <value>Тёмная</value>
+  </data>
+  <data name="CodeGenerationSettingsTitle" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="TabCodeGeneration" xml:space="preserve">
+    <value>Генерация кода</value>
+  </data>
+  <data name="TabSpindle" xml:space="preserve">
+    <value>Шпиндель</value>
+  </data>
+  <data name="TabCoolant" xml:space="preserve">
+    <value>СОЖ</value>
+  </data>
+  <data name="CoolantAddCode" xml:space="preserve">
+    <value>Добавлять код управления СОЖ</value>
+  </data>
+  <data name="CoolantEnableAtStart" xml:space="preserve">
+    <value>Включать СОЖ в начале программы (М8)</value>
+  </data>
+  <data name="CoolantDisableAtEnd" xml:space="preserve">
+    <value>Выключать СОЖ в конце программы (М9)</value>
+  </data>
+  <data name="SpindleAddCode" xml:space="preserve">
+    <value>Добавлять код управления шпинделем</value>
+  </data>
+  <data name="SpindleSetSpeed" xml:space="preserve">
+    <value>Устанавливать скорость шпинделя</value>
+  </data>
+  <data name="SpindleSpeedLabel" xml:space="preserve">
+    <value>Скорость вращения шпинделя, об/мин</value>
+  </data>
+  <data name="SpindleEnableBeforeOperations" xml:space="preserve">
+    <value>Включать шпиндель перед операциями</value>
+  </data>
+  <data name="SpindleEnableCommandLabel" xml:space="preserve">
+    <value>Команда включения</value>
+  </data>
+  <data name="SpindleEnableCommandM3" xml:space="preserve">
+    <value>М3</value>
+  </data>
+  <data name="SpindleEnableCommandM4" xml:space="preserve">
+    <value>М4</value>
+  </data>
+  <data name="SpindleAddDelayAfterEnable" xml:space="preserve">
+    <value>Добавлять задержку после включения (G4)</value>
+  </data>
+  <data name="SpindleDelayParameterLabel" xml:space="preserve">
+    <value>Параметр задержки</value>
+  </data>
+  <data name="SpindleDelayParameterF" xml:space="preserve">
+    <value>F</value>
+  </data>
+  <data name="SpindleDelayParameterP" xml:space="preserve">
+    <value>P</value>
+  </data>
+  <data name="SpindleDelayParameterPxx" xml:space="preserve">
+    <value>Pxx.</value>
+  </data>
+  <data name="SpindleDelayValueLabel" xml:space="preserve">
+    <value>Величина параметра</value>
+  </data>
+  <data name="SpindleDisableAfterOperations" xml:space="preserve">
+    <value>Выключать шпиндель после операций (М5)</value>
+  </data>
+  <data name="CodeGenUseLineNumbers" xml:space="preserve">
+    <value>Использовать номера строк (N...)</value>
+  </data>
+  <data name="CodeGenStartLineNumber" xml:space="preserve">
+    <value>Начальный номер строки</value>
+  </data>
+  <data name="CodeGenLineNumberStep" xml:space="preserve">
+    <value>Шаг номера строки</value>
+  </data>
+  <data name="CodeGenGenerateComments" xml:space="preserve">
+    <value>Генерировать комментарии</value>
+  </data>
+  <data name="CodeGenAllowArcs" xml:space="preserve">
+    <value>Разрешить дуги (G2/G3)</value>
+  </data>
+  <data name="CodeGenFormatCommands" xml:space="preserve">
+    <value>Формат команд G01/G00 вместо G1/G0</value>
+  </data>
+  <data name="CodeGenSetWorkCoordinateSystem" xml:space="preserve">
+    <value>Устанавливать рабочую систему координат в начале программы</value>
+  </data>
+  <data name="CodeGenCoordinateSystemLabel" xml:space="preserve">
+    <value>Система координат</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG54" xml:space="preserve">
+    <value>G54</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG55" xml:space="preserve">
+    <value>G55</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG56" xml:space="preserve">
+    <value>G56</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG57" xml:space="preserve">
+    <value>G57</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG58" xml:space="preserve">
+    <value>G58</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG59" xml:space="preserve">
+    <value>G59</value>
+  </data>
+  <data name="CodeGenSetAbsoluteCoordinates" xml:space="preserve">
+    <value>Устанавливать абсолютную систему координат G90</value>
+  </data>
+  <data name="CodeGenAllowRelativeCoordinates" xml:space="preserve">
+    <value>Разрешить использование относительной системы координат внутри отдельных операций (G91)</value>
+  </data>
+  <data name="CodeGenSetZerosAtStart" xml:space="preserve">
+    <value>В начале программы выполнить установку нулей (G92)</value>
+  </data>
+  <data name="CodeGenX0" xml:space="preserve">
+    <value>X0</value>
+  </data>
+  <data name="CodeGenY0" xml:space="preserve">
+    <value>Y0</value>
+  </data>
+  <data name="CodeGenZ0" xml:space="preserve">
+    <value>Z0</value>
+  </data>
+  <data name="CodeGenMoveToPointAtEnd" xml:space="preserve">
+    <value>В конце программы перейти в точку</value>
+  </data>
+  <data name="CodeGenX" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="CodeGenY" xml:space="preserve">
+    <value>Y</value>
+  </data>
+  <data name="CodeGenZ" xml:space="preserve">
+    <value>Z</value>
   </data>
 </root>

@@ -73,6 +73,9 @@
   <data name="MenuApplicationSettings" xml:space="preserve">
     <value>Application Settings</value>
   </data>
+  <data name="MenuCodeGenerationSettings" xml:space="preserve">
+    <value>Code Generation Settings</value>
+  </data>
   <data name="RibbonTabDrilling" xml:space="preserve">
     <value>Drilling</value>
   </data>
@@ -117,6 +120,141 @@
   </data>
   <data name="ThemeDark" xml:space="preserve">
     <value>Dark</value>
+  </data>
+  <data name="CodeGenerationSettingsTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="TabCodeGeneration" xml:space="preserve">
+    <value>Code Generation</value>
+  </data>
+  <data name="TabSpindle" xml:space="preserve">
+    <value>Spindle</value>
+  </data>
+  <data name="TabCoolant" xml:space="preserve">
+    <value>Coolant</value>
+  </data>
+  <data name="CoolantAddCode" xml:space="preserve">
+    <value>Add coolant control code</value>
+  </data>
+  <data name="CoolantEnableAtStart" xml:space="preserve">
+    <value>Enable coolant at program start (M8)</value>
+  </data>
+  <data name="CoolantDisableAtEnd" xml:space="preserve">
+    <value>Disable coolant at program end (M9)</value>
+  </data>
+  <data name="SpindleAddCode" xml:space="preserve">
+    <value>Add spindle control code</value>
+  </data>
+  <data name="SpindleSetSpeed" xml:space="preserve">
+    <value>Set spindle speed</value>
+  </data>
+  <data name="SpindleSpeedLabel" xml:space="preserve">
+    <value>Spindle rotation speed, rpm</value>
+  </data>
+  <data name="SpindleEnableBeforeOperations" xml:space="preserve">
+    <value>Enable spindle before operations</value>
+  </data>
+  <data name="SpindleEnableCommandLabel" xml:space="preserve">
+    <value>Enable command</value>
+  </data>
+  <data name="SpindleEnableCommandM3" xml:space="preserve">
+    <value>M3</value>
+  </data>
+  <data name="SpindleEnableCommandM4" xml:space="preserve">
+    <value>M4</value>
+  </data>
+  <data name="SpindleAddDelayAfterEnable" xml:space="preserve">
+    <value>Add delay after enable (G4)</value>
+  </data>
+  <data name="SpindleDelayParameterLabel" xml:space="preserve">
+    <value>Delay parameter</value>
+  </data>
+  <data name="SpindleDelayParameterF" xml:space="preserve">
+    <value>F</value>
+  </data>
+  <data name="SpindleDelayParameterP" xml:space="preserve">
+    <value>P</value>
+  </data>
+  <data name="SpindleDelayParameterPxx" xml:space="preserve">
+    <value>Pxx.</value>
+  </data>
+  <data name="SpindleDelayValueLabel" xml:space="preserve">
+    <value>Parameter value</value>
+  </data>
+  <data name="SpindleDisableAfterOperations" xml:space="preserve">
+    <value>Disable spindle after operations (M5)</value>
+  </data>
+  <data name="CodeGenUseLineNumbers" xml:space="preserve">
+    <value>Use line numbers (N...)</value>
+  </data>
+  <data name="CodeGenStartLineNumber" xml:space="preserve">
+    <value>Start line number</value>
+  </data>
+  <data name="CodeGenLineNumberStep" xml:space="preserve">
+    <value>Line number step</value>
+  </data>
+  <data name="CodeGenGenerateComments" xml:space="preserve">
+    <value>Generate comments</value>
+  </data>
+  <data name="CodeGenAllowArcs" xml:space="preserve">
+    <value>Allow arcs (G2/G3)</value>
+  </data>
+  <data name="CodeGenFormatCommands" xml:space="preserve">
+    <value>Format commands G01/G00 instead of G1/G0</value>
+  </data>
+  <data name="CodeGenSetWorkCoordinateSystem" xml:space="preserve">
+    <value>Set work coordinate system at program start</value>
+  </data>
+  <data name="CodeGenCoordinateSystemLabel" xml:space="preserve">
+    <value>Coordinate system</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG54" xml:space="preserve">
+    <value>G54</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG55" xml:space="preserve">
+    <value>G55</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG56" xml:space="preserve">
+    <value>G56</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG57" xml:space="preserve">
+    <value>G57</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG58" xml:space="preserve">
+    <value>G58</value>
+  </data>
+  <data name="CodeGenCoordinateSystemG59" xml:space="preserve">
+    <value>G59</value>
+  </data>
+  <data name="CodeGenSetAbsoluteCoordinates" xml:space="preserve">
+    <value>Set absolute coordinate system G90</value>
+  </data>
+  <data name="CodeGenAllowRelativeCoordinates" xml:space="preserve">
+    <value>Allow relative coordinate system within individual operations (G91)</value>
+  </data>
+  <data name="CodeGenSetZerosAtStart" xml:space="preserve">
+    <value>Set zeros at program start (G92)</value>
+  </data>
+  <data name="CodeGenX0" xml:space="preserve">
+    <value>X0</value>
+  </data>
+  <data name="CodeGenY0" xml:space="preserve">
+    <value>Y0</value>
+  </data>
+  <data name="CodeGenZ0" xml:space="preserve">
+    <value>Z0</value>
+  </data>
+  <data name="CodeGenMoveToPointAtEnd" xml:space="preserve">
+    <value>Move to point at program end</value>
+  </data>
+  <data name="CodeGenX" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="CodeGenY" xml:space="preserve">
+    <value>Y</value>
+  </data>
+  <data name="CodeGenZ" xml:space="preserve">
+    <value>Z</value>
   </data>
 </root>
 

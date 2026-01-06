@@ -81,6 +81,7 @@ public static class Resources
     // Menu strings
     public static string MenuSettings => GetString(nameof(MenuSettings), "Settings");
     public static string MenuApplicationSettings => GetString(nameof(MenuApplicationSettings), "Application Settings");
+    public static string MenuCodeGenerationSettings => GetString(nameof(MenuCodeGenerationSettings), "Code Generation Settings");
 
     // Ribbon tab headers
     public static string RibbonTabDrilling => GetString(nameof(RibbonTabDrilling), "Drilling");
@@ -101,6 +102,57 @@ public static class Resources
     public static string ThemeAuto => GetString(nameof(ThemeAuto), "System");
     public static string ThemeLight => GetString(nameof(ThemeLight), "Light");
     public static string ThemeDark => GetString(nameof(ThemeDark), "Dark");
+
+    // Code generation settings window strings
+    public static string CodeGenerationSettingsTitle => GetString(nameof(CodeGenerationSettingsTitle), "Settings");
+    public static string TabCodeGeneration => GetString(nameof(TabCodeGeneration), "Code Generation");
+    public static string TabSpindle => GetString(nameof(TabSpindle), "Spindle");
+    public static string TabCoolant => GetString(nameof(TabCoolant), "Coolant");
+    public static string CoolantAddCode => GetString(nameof(CoolantAddCode), "Add coolant control code");
+    public static string CoolantEnableAtStart => GetString(nameof(CoolantEnableAtStart), "Enable coolant at program start (M8)");
+    public static string CoolantDisableAtEnd => GetString(nameof(CoolantDisableAtEnd), "Disable coolant at program end (M9)");
+    
+    // Spindle settings strings
+    public static string SpindleAddCode => GetString(nameof(SpindleAddCode), "Add spindle control code");
+    public static string SpindleSetSpeed => GetString(nameof(SpindleSetSpeed), "Set spindle speed");
+    public static string SpindleSpeedLabel => GetString(nameof(SpindleSpeedLabel), "Spindle rotation speed, rpm");
+    public static string SpindleEnableBeforeOperations => GetString(nameof(SpindleEnableBeforeOperations), "Enable spindle before operations");
+    public static string SpindleEnableCommandLabel => GetString(nameof(SpindleEnableCommandLabel), "Enable command");
+    public static string SpindleEnableCommandM3 => GetString(nameof(SpindleEnableCommandM3), "M3");
+    public static string SpindleEnableCommandM4 => GetString(nameof(SpindleEnableCommandM4), "M4");
+    public static string SpindleAddDelayAfterEnable => GetString(nameof(SpindleAddDelayAfterEnable), "Add delay after enable (G4)");
+    public static string SpindleDelayParameterLabel => GetString(nameof(SpindleDelayParameterLabel), "Delay parameter");
+    public static string SpindleDelayParameterF => GetString(nameof(SpindleDelayParameterF), "F");
+    public static string SpindleDelayParameterP => GetString(nameof(SpindleDelayParameterP), "P");
+    public static string SpindleDelayParameterPxx => GetString(nameof(SpindleDelayParameterPxx), "Pxx.");
+    public static string SpindleDelayValueLabel => GetString(nameof(SpindleDelayValueLabel), "Parameter value");
+    public static string SpindleDisableAfterOperations => GetString(nameof(SpindleDisableAfterOperations), "Disable spindle after operations (M5)");
+    
+    // Code generation settings strings
+    public static string CodeGenUseLineNumbers => GetString(nameof(CodeGenUseLineNumbers), "Use line numbers (N...)");
+    public static string CodeGenStartLineNumber => GetString(nameof(CodeGenStartLineNumber), "Start line number");
+    public static string CodeGenLineNumberStep => GetString(nameof(CodeGenLineNumberStep), "Line number step");
+    public static string CodeGenGenerateComments => GetString(nameof(CodeGenGenerateComments), "Generate comments");
+    public static string CodeGenAllowArcs => GetString(nameof(CodeGenAllowArcs), "Allow arcs (G2/G3)");
+    public static string CodeGenFormatCommands => GetString(nameof(CodeGenFormatCommands), "Format commands G01/G00 instead of G1/G0");
+    public static string CodeGenSetWorkCoordinateSystem => GetString(nameof(CodeGenSetWorkCoordinateSystem), "Set work coordinate system at program start");
+    public static string CodeGenCoordinateSystemLabel => GetString(nameof(CodeGenCoordinateSystemLabel), "Coordinate system");
+    public static string CodeGenCoordinateSystemG54 => GetString(nameof(CodeGenCoordinateSystemG54), "G54");
+    public static string CodeGenCoordinateSystemG55 => GetString(nameof(CodeGenCoordinateSystemG55), "G55");
+    public static string CodeGenCoordinateSystemG56 => GetString(nameof(CodeGenCoordinateSystemG56), "G56");
+    public static string CodeGenCoordinateSystemG57 => GetString(nameof(CodeGenCoordinateSystemG57), "G57");
+    public static string CodeGenCoordinateSystemG58 => GetString(nameof(CodeGenCoordinateSystemG58), "G58");
+    public static string CodeGenCoordinateSystemG59 => GetString(nameof(CodeGenCoordinateSystemG59), "G59");
+    public static string CodeGenSetAbsoluteCoordinates => GetString(nameof(CodeGenSetAbsoluteCoordinates), "Set absolute coordinate system G90");
+    public static string CodeGenAllowRelativeCoordinates => GetString(nameof(CodeGenAllowRelativeCoordinates), "Allow relative coordinate system within individual operations (G91)");
+    public static string CodeGenSetZerosAtStart => GetString(nameof(CodeGenSetZerosAtStart), "Set zeros at program start (G92)");
+    public static string CodeGenX0 => GetString(nameof(CodeGenX0), "X0");
+    public static string CodeGenY0 => GetString(nameof(CodeGenY0), "Y0");
+    public static string CodeGenZ0 => GetString(nameof(CodeGenZ0), "Z0");
+    public static string CodeGenMoveToPointAtEnd => GetString(nameof(CodeGenMoveToPointAtEnd), "Move to point at program end");
+    public static string CodeGenX => GetString(nameof(CodeGenX), "X");
+    public static string CodeGenY => GetString(nameof(CodeGenY), "Y");
+    public static string CodeGenZ => GetString(nameof(CodeGenZ), "Z");
 }
 
 /// <summary>

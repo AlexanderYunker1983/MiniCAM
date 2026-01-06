@@ -26,6 +26,7 @@ public partial class MainViewModel : ViewModelBase
     {
         MenuSettingsText = Resources.MenuSettings;
         MenuApplicationSettingsText = Resources.MenuApplicationSettings;
+        MenuCodeGenerationSettingsText = Resources.MenuCodeGenerationSettings;
         RibbonTabDrillingText = Resources.RibbonTabDrilling;
         RibbonTabPocketText = Resources.RibbonTabPocket;
         RibbonTabProfileText = Resources.RibbonTabProfile;
@@ -37,6 +38,9 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _menuApplicationSettingsText = Resources.MenuApplicationSettings;
+
+    [ObservableProperty]
+    private string _menuCodeGenerationSettingsText = Resources.MenuCodeGenerationSettings;
 
     // Ribbon tab headers
 
@@ -63,6 +67,18 @@ public partial class MainViewModel : ViewModelBase
         {
             DataContext = new ApplicationSettingsViewModel()
         };
+
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            settingsWindow.Icon = desktop.MainWindow?.Icon;
+            settingsWindow.ShowDialog(desktop.MainWindow);
+        }
+    }
+
+    [RelayCommand]
+    private void OpenCodeGenerationSettings()
+    {
+        var settingsWindow = new CodeGenerationSettingsWindow();
 
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

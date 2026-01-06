@@ -15,6 +15,8 @@
       <MenuItem Header="{Binding MenuSettingsText}">
         <MenuItem Header="{Binding MenuApplicationSettingsText}"
                   Command="{Binding OpenApplicationSettingsCommand}" />
+        <MenuItem Header="{Binding MenuCodeGenerationSettingsText}"
+                  Command="{Binding OpenCodeGenerationSettingsCommand}" />
       </MenuItem>
     </Menu>
 

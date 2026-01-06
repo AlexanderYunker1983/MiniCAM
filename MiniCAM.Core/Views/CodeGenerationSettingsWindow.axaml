@@ -1,0 +1,347 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:MiniCAM.Core.ViewModels"
+        x:Class="MiniCAM.Core.Views.CodeGenerationSettingsWindow"
+        x:DataType="vm:CodeGenerationSettingsViewModel"
+        mc:Ignorable="d"
+        Width="500"
+        Height="400"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner">
+  <Design.DataContext>
+    <vm:CodeGenerationSettingsViewModel />
+  </Design.DataContext>
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://MiniCAM.Core/Views/MainViewResources.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
+
+  <Window.Styles>
+    <StyleInclude Source="avares://MiniCAM.Core/Views/MainViewStyles.axaml" />
+  </Window.Styles>
+
+  <Grid RowDefinitions="*, Auto">
+    <Border Grid.Row="0"
+            Background="{DynamicResource RibbonBackgroundBrush}"
+            BorderBrush="{DynamicResource RibbonBorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="11">
+      <TabControl Classes="RibbonTabs">
+        <!-- Code Generation tab -->
+        <TabItem>
+          <TabItem.Header>
+            <TextBlock x:Name="TabCodeGenerationText"
+                       FontSize="{StaticResource RibbonTabHeaderFontSize}" />
+          </TabItem.Header>
+          <Border Classes="RibbonTabContent">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <StackPanel Spacing="12" Margin="8">
+                <!-- Use line numbers -->
+                <CheckBox IsChecked="{Binding UseLineNumbers, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenUseLineNumbersHeaderText}"
+                               FontStyle="{Binding CodeGenUseLineNumbersFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+                <StackPanel Spacing="4" Margin="20,0,0,0"
+                            IsEnabled="{Binding IsLineNumberOptionsEnabled}">
+                  <TextBlock Text="{Binding CodeGenStartLineNumberHeaderText}"
+                             FontStyle="{Binding CodeGenStartLineNumberFontStyle}" />
+                  <TextBox Text="{Binding StartLineNumber, Mode=TwoWay}"
+                            Watermark="10" />
+                  <TextBlock Text="{Binding CodeGenLineNumberStepHeaderText}"
+                             FontStyle="{Binding CodeGenLineNumberStepFontStyle}" />
+                  <TextBox Text="{Binding LineNumberStep, Mode=TwoWay}"
+                            Watermark="10" />
+                </StackPanel>
+
+                <!-- Generate comments -->
+                <CheckBox IsChecked="{Binding GenerateComments, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenGenerateCommentsHeaderText}"
+                               FontStyle="{Binding CodeGenGenerateCommentsFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+
+                <!-- Allow arcs -->
+                <CheckBox IsChecked="{Binding AllowArcs, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenAllowArcsHeaderText}"
+                               FontStyle="{Binding CodeGenAllowArcsFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+
+                <!-- Format commands -->
+                <CheckBox IsChecked="{Binding FormatCommands, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenFormatCommandsHeaderText}"
+                               FontStyle="{Binding CodeGenFormatCommandsFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+
+                <!-- Set work coordinate system -->
+                <CheckBox IsChecked="{Binding SetWorkCoordinateSystem, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenSetWorkCoordinateSystemHeaderText}"
+                               FontStyle="{Binding CodeGenSetWorkCoordinateSystemFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+                <StackPanel Spacing="4" Margin="20,0,0,0"
+                            IsEnabled="{Binding IsCoordinateSystemComboEnabled}">
+                  <TextBlock Text="{Binding CodeGenCoordinateSystemLabelHeaderText}"
+                             FontStyle="{Binding CodeGenCoordinateSystemLabelFontStyle}" />
+                  <ComboBox ItemsSource="{Binding CoordinateSystems}"
+                            SelectedItem="{Binding SelectedCoordinateSystem, Mode=TwoWay}"
+                            HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate x:DataType="vm:CoordinateSystemOption">
+                        <TextBlock Text="{Binding DisplayName}" />
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                </StackPanel>
+
+                <!-- Set absolute coordinates -->
+                <CheckBox IsChecked="{Binding SetAbsoluteCoordinates, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenSetAbsoluteCoordinatesHeaderText}"
+                               FontStyle="{Binding CodeGenSetAbsoluteCoordinatesFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+
+                <!-- Allow relative coordinates -->
+                <CheckBox IsChecked="{Binding AllowRelativeCoordinates, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenAllowRelativeCoordinatesHeaderText}"
+                               FontStyle="{Binding CodeGenAllowRelativeCoordinatesFontStyle}"
+                               TextWrapping="Wrap" />
+                  </CheckBox.Content>
+                </CheckBox>
+
+                <!-- Set zeros at start -->
+                <CheckBox IsChecked="{Binding SetZerosAtStart, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenSetZerosAtStartHeaderText}"
+                               FontStyle="{Binding CodeGenSetZerosAtStartFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+                <Grid Margin="20,0,0,0"
+                      ColumnDefinitions="Auto,*,Auto,*,Auto,*"
+                      ColumnSpacing="8"
+                      RowSpacing="4"
+                      IsEnabled="{Binding IsSetZerosOptionsEnabled}">
+                  <TextBlock Text="{Binding CodeGenX0HeaderText}"
+                             FontStyle="{Binding CodeGenX0FontStyle}"
+                             Grid.Column="0"
+                             VerticalAlignment="Center" />
+                  <TextBox Text="{Binding X0, Mode=TwoWay}"
+                            Watermark="0"
+                            Grid.Column="1" />
+                  <TextBlock Text="{Binding CodeGenY0HeaderText}"
+                             FontStyle="{Binding CodeGenY0FontStyle}"
+                             Grid.Column="2"
+                             VerticalAlignment="Center" />
+                  <TextBox Text="{Binding Y0, Mode=TwoWay}"
+                            Watermark="0"
+                            Grid.Column="3" />
+                  <TextBlock Text="{Binding CodeGenZ0HeaderText}"
+                             FontStyle="{Binding CodeGenZ0FontStyle}"
+                             Grid.Column="4"
+                             VerticalAlignment="Center" />
+                  <TextBox Text="{Binding Z0, Mode=TwoWay}"
+                            Watermark="0"
+                            Grid.Column="5" />
+                </Grid>
+
+                <!-- Move to point at end -->
+                <CheckBox IsChecked="{Binding MoveToPointAtEnd, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding CodeGenMoveToPointAtEndHeaderText}"
+                               FontStyle="{Binding CodeGenMoveToPointAtEndFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+                <Grid Margin="20,0,0,0"
+                      ColumnDefinitions="Auto,*,Auto,*,Auto,*"
+                      ColumnSpacing="8"
+                      RowSpacing="4"
+                      IsEnabled="{Binding IsMoveToPointOptionsEnabled}">
+                  <TextBlock Text="{Binding CodeGenXHeaderText}"
+                             FontStyle="{Binding CodeGenXFontStyle}"
+                             Grid.Column="0"
+                             VerticalAlignment="Center" />
+                  <TextBox Text="{Binding X, Mode=TwoWay}"
+                            Watermark="0"
+                            Grid.Column="1" />
+                  <TextBlock Text="{Binding CodeGenYHeaderText}"
+                             FontStyle="{Binding CodeGenYFontStyle}"
+                             Grid.Column="2"
+                             VerticalAlignment="Center" />
+                  <TextBox Text="{Binding Y, Mode=TwoWay}"
+                            Watermark="0"
+                            Grid.Column="3" />
+                  <TextBlock Text="{Binding CodeGenZHeaderText}"
+                             FontStyle="{Binding CodeGenZFontStyle}"
+                             Grid.Column="4"
+                             VerticalAlignment="Center" />
+                  <TextBox Text="{Binding Z, Mode=TwoWay}"
+                            Watermark="0"
+                            Grid.Column="5" />
+                </Grid>
+              </StackPanel>
+            </ScrollViewer>
+          </Border>
+        </TabItem>
+        <!-- Spindle tab -->
+        <TabItem>
+          <TabItem.Header>
+            <TextBlock x:Name="TabSpindleText"
+                       FontSize="{StaticResource RibbonTabHeaderFontSize}" />
+          </TabItem.Header>
+          <Border Classes="RibbonTabContent">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <StackPanel Spacing="12" Margin="8">
+                <!-- Main checkbox: Add spindle control code -->
+                <CheckBox IsChecked="{Binding AddSpindleCode, Mode=TwoWay}">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding SpindleAddCodeHeaderText}"
+                               FontStyle="{Binding SpindleAddCodeFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+                
+                <!-- Set spindle speed -->
+                <CheckBox IsChecked="{Binding SetSpindleSpeed, Mode=TwoWay}"
+                          IsEnabled="{Binding IsSpindleSubOptionsEnabled}"
+                          Margin="20,0,0,0">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding SpindleSetSpeedHeaderText}"
+                               FontStyle="{Binding SpindleSetSpeedFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+                <StackPanel Spacing="4" Margin="40,0,0,0"
+                            IsEnabled="{Binding IsSpindleSpeedInputEnabled}">
+                  <TextBlock Text="{Binding SpindleSpeedLabelHeaderText}"
+                             FontStyle="{Binding SpindleSpeedLabelFontStyle}" />
+                  <TextBox Text="{Binding SpindleSpeed, Mode=TwoWay}"
+                            Watermark="1000" />
+                </StackPanel>
+                
+                <!-- Enable spindle before operations -->
+                <CheckBox IsChecked="{Binding EnableSpindleBeforeOperations, Mode=TwoWay}"
+                          IsEnabled="{Binding IsSpindleSubOptionsEnabled}"
+                          Margin="20,0,0,0">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding SpindleEnableBeforeOperationsHeaderText}"
+                               FontStyle="{Binding SpindleEnableBeforeOperationsFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+                <StackPanel Spacing="4" Margin="40,0,0,0"
+                            IsEnabled="{Binding IsSpindleEnableSubOptionsEnabled}">
+                  <TextBlock Text="{Binding SpindleEnableCommandLabelHeaderText}"
+                             FontStyle="{Binding SpindleEnableCommandLabelFontStyle}" />
+                  <ComboBox ItemsSource="{Binding SpindleEnableCommands}"
+                            SelectedItem="{Binding SelectedSpindleEnableCommand, Mode=TwoWay}"
+                            HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate x:DataType="vm:SpindleEnableCommandOption">
+                        <TextBlock Text="{Binding DisplayName}" />
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  
+                  <!-- Add delay after enable -->
+                  <CheckBox IsChecked="{Binding AddSpindleDelayAfterEnable, Mode=TwoWay}"
+                            Margin="0,8,0,0">
+                    <CheckBox.Content>
+                      <TextBlock Text="{Binding SpindleAddDelayAfterEnableHeaderText}"
+                                 FontStyle="{Binding SpindleAddDelayAfterEnableFontStyle}" />
+                    </CheckBox.Content>
+                  </CheckBox>
+                  <StackPanel Spacing="4" Margin="20,0,0,0"
+                              IsEnabled="{Binding IsSpindleDelaySubOptionsEnabled}">
+                    <TextBlock Text="{Binding SpindleDelayParameterLabelHeaderText}"
+                               FontStyle="{Binding SpindleDelayParameterLabelFontStyle}" />
+                    <ComboBox ItemsSource="{Binding SpindleDelayParameters}"
+                              SelectedItem="{Binding SelectedSpindleDelayParameter, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch">
+                      <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SpindleDelayParameterOption">
+                          <TextBlock Text="{Binding DisplayName}" />
+                        </DataTemplate>
+                      </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Text="{Binding SpindleDelayValueLabelHeaderText}"
+                               FontStyle="{Binding SpindleDelayValueLabelFontStyle}" />
+                    <TextBox Text="{Binding SpindleDelayValue, Mode=TwoWay}"
+                              Watermark="2" />
+                  </StackPanel>
+                </StackPanel>
+                
+                <!-- Disable spindle after operations -->
+                <CheckBox IsChecked="{Binding DisableSpindleAfterOperations, Mode=TwoWay}"
+                          IsEnabled="{Binding IsSpindleSubOptionsEnabled}"
+                          Margin="20,0,0,0">
+                  <CheckBox.Content>
+                    <TextBlock Text="{Binding SpindleDisableAfterOperationsHeaderText}"
+                               FontStyle="{Binding SpindleDisableAfterOperationsFontStyle}" />
+                  </CheckBox.Content>
+                </CheckBox>
+              </StackPanel>
+            </ScrollViewer>
+          </Border>
+        </TabItem>
+        <!-- Coolant tab -->
+        <TabItem>
+          <TabItem.Header>
+            <TextBlock x:Name="TabCoolantText"
+                       FontSize="{StaticResource RibbonTabHeaderFontSize}" />
+          </TabItem.Header>
+          <Border Classes="RibbonTabContent">
+            <StackPanel Spacing="12" Margin="8">
+              <CheckBox IsChecked="{Binding AddCoolantCode, Mode=TwoWay}">
+                <CheckBox.Content>
+                  <TextBlock Text="{Binding CoolantAddCodeHeaderText}"
+                             FontStyle="{Binding CoolantAddCodeFontStyle}" />
+                </CheckBox.Content>
+              </CheckBox>
+              <CheckBox IsChecked="{Binding EnableCoolantAtStart, Mode=TwoWay}"
+                        IsEnabled="{Binding IsCoolantSubOptionsEnabled}"
+                        Margin="20,0,0,0">
+                <CheckBox.Content>
+                  <TextBlock Text="{Binding CoolantEnableAtStartHeaderText}"
+                             FontStyle="{Binding CoolantEnableAtStartFontStyle}" />
+                </CheckBox.Content>
+              </CheckBox>
+              <CheckBox IsChecked="{Binding DisableCoolantAtEnd, Mode=TwoWay}"
+                        IsEnabled="{Binding IsCoolantSubOptionsEnabled}"
+                        Margin="20,0,0,0">
+                <CheckBox.Content>
+                  <TextBlock Text="{Binding CoolantDisableAtEndHeaderText}"
+                             FontStyle="{Binding CoolantDisableAtEndFontStyle}" />
+                </CheckBox.Content>
+              </CheckBox>
+            </StackPanel>
+          </Border>
+        </TabItem>
+      </TabControl>
+    </Border>
+
+    <Border Grid.Row="1"
+            Background="{DynamicResource ThemeBackgroundBrush}"
+            Padding="16"
+            BorderBrush="{DynamicResource RibbonBorderBrush}"
+            BorderThickness="0,1,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="{Binding ApplyButtonText}"
+                Command="{Binding ApplyCommand}" />
+        <Button Content="{Binding ResetButtonText}"
+                Command="{Binding ResetCommand}" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>
+

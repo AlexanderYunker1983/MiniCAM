@@ -48,5 +48,41 @@ public class AppSettings
     /// "auto" means follow system theme.
     /// </summary>
     public string? Theme { get; set; }
+
+    // Code Generation Settings
+    public bool? UseLineNumbers { get; set; }
+    public string? StartLineNumber { get; set; }
+    public string? LineNumberStep { get; set; }
+    public bool? GenerateComments { get; set; }
+    public bool? AllowArcs { get; set; }
+    public bool? FormatCommands { get; set; }
+    public bool? SetWorkCoordinateSystem { get; set; }
+    public string? CoordinateSystem { get; set; }
+    public bool? SetAbsoluteCoordinates { get; set; }
+    public bool? AllowRelativeCoordinates { get; set; }
+    public bool? SetZerosAtStart { get; set; }
+    public string? X0 { get; set; }
+    public string? Y0 { get; set; }
+    public string? Z0 { get; set; }
+    public bool? MoveToPointAtEnd { get; set; }
+    public string? X { get; set; }
+    public string? Y { get; set; }
+    public string? Z { get; set; }
+
+    // Spindle Settings
+    public bool? AddSpindleCode { get; set; }
+    public bool? SetSpindleSpeed { get; set; }
+    public string? SpindleSpeed { get; set; }
+    public bool? EnableSpindleBeforeOperations { get; set; }
+    public string? SpindleEnableCommand { get; set; }
+    public bool? AddSpindleDelayAfterEnable { get; set; }
+    public string? SpindleDelayParameter { get; set; }
+    public string? SpindleDelayValue { get; set; }
+    public bool? DisableSpindleAfterOperations { get; set; }
+
+    // Coolant Settings
+    public bool? AddCoolantCode { get; set; }
+    public bool? EnableCoolantAtStart { get; set; }
+    public bool? DisableCoolantAtEnd { get; set; }
 }
 
