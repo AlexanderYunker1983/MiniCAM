@@ -73,6 +73,18 @@
   <data name="MenuApplicationSettings" xml:space="preserve">
     <value>Application Settings</value>
   </data>
+  <data name="RibbonTabDrilling" xml:space="preserve">
+    <value>Drilling</value>
+  </data>
+  <data name="RibbonTabPocket" xml:space="preserve">
+    <value>Pocket</value>
+  </data>
+  <data name="RibbonTabProfile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="RibbonTabOther" xml:space="preserve">
+    <value>Other</value>
+  </data>
   <data name="ApplicationSettingsTitle" xml:space="preserve">
     <value>Application settings</value>
   </data>

@@ -132,6 +132,18 @@
   <data name="MenuApplicationSettings" xml:space="preserve">
     <value>Настройки приложения</value>
   </data>
+  <data name="RibbonTabDrilling" xml:space="preserve">
+    <value>Сверление</value>
+  </data>
+  <data name="RibbonTabPocket" xml:space="preserve">
+    <value>Карман</value>
+  </data>
+  <data name="RibbonTabProfile" xml:space="preserve">
+    <value>Профиль</value>
+  </data>
+  <data name="RibbonTabOther" xml:space="preserve">
+    <value>Другое</value>
+  </data>
   <data name="ApplicationSettingsTitle" xml:space="preserve">
     <value>Настройки приложения</value>
   </data>

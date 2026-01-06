@@ -1,0 +1,64 @@
+<Styles xmlns="https://github.com/avaloniaui">
+  <!-- Style for the TabControl that represents the ribbon tabs -->
+  <Style Selector="TabControl.RibbonTabs">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="TabStripPlacement" Value="Top" />
+  </Style>
+
+  <!-- Style for tab items inside the ribbon TabControl -->
+  <Style Selector="TabControl.RibbonTabs > TabItem">
+    <Setter Property="Padding" Value="{StaticResource RibbonTabHeaderPadding}" />
+    <Setter Property="MinHeight" Value="28" />
+    <Setter Property="CornerRadius" Value="{StaticResource RibbonTabHeaderCornerRadius}" />
+    <Setter Property="FontSize" Value="{StaticResource RibbonTabHeaderFontSize}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Style for the content border inside each ribbon tab -->
+  <Style Selector="TabControl.RibbonTabs > TabItem Border.RibbonTabContent">
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="Padding" Value="8 6" />
+    <Setter Property="BorderBrush" Value="{DynamicResource RibbonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!-- Style for all buttons inside TabControl with the RibbonTabs class -->
+  <Style Selector="TabControl.RibbonTabs Button">
+    <Setter Property="Width" Value="{StaticResource RibbonButtonWidth}" />
+    <Setter Property="Height" Value="{StaticResource RibbonButtonHeight}" />
+    <Setter Property="CornerRadius" Value="{StaticResource RibbonButtonCornerRadius}" />
+    <Setter Property="Background" Value="{DynamicResource RibbonButtonBackgroundBrush}" />
+  </Style>
+
+  <!-- State: pointer is over the button -->
+  <Style Selector="TabControl.RibbonTabs Button:pointerover">
+    <Setter Property="Background" Value="{DynamicResource RibbonButtonPointerOverBackgroundBrush}" />
+  </Style>
+
+  <!-- State: button is pressed -->
+  <Style Selector="TabControl.RibbonTabs Button:pressed">
+    <Setter Property="Background" Value="{DynamicResource RibbonButtonPressedBackgroundBrush}" />
+  </Style>
+
+  <!-- Base state: gray border around the tab header -->
+  <Style Selector="TabControl.RibbonTabs > TabItem /template/ Border#PART_LayoutRoot">
+    <Setter Property="BorderBrush" Value="{DynamicResource RibbonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <Style Selector="TabControl.RibbonTabs > TabItem:pointerover /template/ Border#PART_LayoutRoot">
+    <Setter Property="Background" Value="{DynamicResource RibbonTabHoverBrush}" />
+  </Style>
+
+  <Style Selector="TabControl.RibbonTabs > TabItem:selected /template/ Border#PART_LayoutRoot">
+    <Setter Property="Background" Value="{DynamicResource RibbonTabSelectedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource RibbonBorderBrush}" />
+  </Style>
+
+  <Style Selector="TabItem:selected /template/ Border#PART_SelectedPipe">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+</Styles>
+
+

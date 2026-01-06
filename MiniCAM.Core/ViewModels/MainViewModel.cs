@@ -12,20 +12,24 @@ public partial class MainViewModel : ViewModelBase
 {
     public MainViewModel()
     {
-        // Subscribe to culture changes to update menu items
+        // Subscribe to culture changes to update localized strings
         Resources.CultureChanged += OnCultureChanged;
-        UpdateMenuStrings();
+        UpdateLocalizedStrings();
     }
 
     private void OnCultureChanged(object? sender, CultureChangedEventArgs e)
     {
-        UpdateMenuStrings();
+        UpdateLocalizedStrings();
     }
 
-    private void UpdateMenuStrings()
+    private void UpdateLocalizedStrings()
     {
         MenuSettingsText = Resources.MenuSettings;
         MenuApplicationSettingsText = Resources.MenuApplicationSettings;
+        RibbonTabDrillingText = Resources.RibbonTabDrilling;
+        RibbonTabPocketText = Resources.RibbonTabPocket;
+        RibbonTabProfileText = Resources.RibbonTabProfile;
+        RibbonTabOtherText = Resources.RibbonTabOther;
     }
 
     [ObservableProperty]
@@ -33,6 +37,24 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _menuApplicationSettingsText = Resources.MenuApplicationSettings;
+
+    // Ribbon tab headers
+
+    [ObservableProperty]
+    private string _ribbonTabDrillingText = Resources.RibbonTabDrilling;
+
+    [ObservableProperty]
+    private string _ribbonTabPocketText = Resources.RibbonTabPocket;
+
+    [ObservableProperty]
+    private string _ribbonTabProfileText = Resources.RibbonTabProfile;
+
+    [ObservableProperty]
+    private string _ribbonTabOtherText = Resources.RibbonTabOther;
+
+    // Controls visibility of the ribbon tab content block.
+    [ObservableProperty]
+    private bool _isRibbonContentVisible = true;
 
     [RelayCommand]
     private void OpenApplicationSettings()
@@ -45,11 +67,7 @@ public partial class MainViewModel : ViewModelBase
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             settingsWindow.Icon = desktop.MainWindow?.Icon;
-            settingsWindow.Show(desktop.MainWindow);
-        }
-        else
-        {
-            settingsWindow.Show();
+            settingsWindow.ShowDialog(desktop.MainWindow);
         }
     }
 }

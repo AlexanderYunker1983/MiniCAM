@@ -82,6 +82,12 @@ public static class Resources
     public static string MenuSettings => GetString(nameof(MenuSettings), "Settings");
     public static string MenuApplicationSettings => GetString(nameof(MenuApplicationSettings), "Application Settings");
 
+    // Ribbon tab headers
+    public static string RibbonTabDrilling => GetString(nameof(RibbonTabDrilling), "Drilling");
+    public static string RibbonTabPocket => GetString(nameof(RibbonTabPocket), "Pocket");
+    public static string RibbonTabProfile => GetString(nameof(RibbonTabProfile), "Profile");
+    public static string RibbonTabOther => GetString(nameof(RibbonTabOther), "Other");
+
     // Application settings window strings
     public static string ApplicationSettingsTitle => GetString(nameof(ApplicationSettingsTitle), "Application settings");
     public static string LanguageLabel => GetString(nameof(LanguageLabel), "Application language");

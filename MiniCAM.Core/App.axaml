@@ -9,6 +9,87 @@
         <local:ViewLocator/>
     </Application.DataTemplates>
 
+    <Application.Resources>
+      <ResourceDictionary>
+        <ResourceDictionary.ThemeDictionaries>
+          <!-- Light theme colors -->
+          <ResourceDictionary x:Key="Light">
+            <Color x:Key="RibbonBackgroundColor">#f2f4f7</Color>
+            <Color x:Key="RibbonBorderColor">#d0d6dd</Color>
+            <Color x:Key="RibbonTabHoverColor">#f1f2f4</Color>
+            <Color x:Key="RibbonTabSelectedColor">#b7bcc7</Color>
+            <Color x:Key="RibbonButtonBackgroundColor">#ffffffff</Color>
+            <Color x:Key="RibbonButtonPointerOverBackgroundColor">#fff0f0f0</Color>
+            <Color x:Key="RibbonButtonPressedBackgroundColor">#ffe0e0e0</Color>
+            <SolidColorBrush x:Key="RibbonBackgroundBrush"
+                             Color="{StaticResource RibbonBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonBorderBrush"
+                             Color="{StaticResource RibbonBorderColor}" />
+            <SolidColorBrush x:Key="RibbonTabHoverBrush"
+                             Color="{StaticResource RibbonTabHoverColor}" />
+            <SolidColorBrush x:Key="RibbonTabSelectedBrush"
+                             Color="{StaticResource RibbonTabSelectedColor}" />
+            <SolidColorBrush x:Key="RibbonButtonBackgroundBrush"
+                             Color="{StaticResource RibbonButtonBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonButtonPointerOverBackgroundBrush"
+                             Color="{StaticResource RibbonButtonPointerOverBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonButtonPressedBackgroundBrush"
+                             Color="{StaticResource RibbonButtonPressedBackgroundColor}" />
+          </ResourceDictionary>
+
+          <!-- Dark theme colors -->
+          <ResourceDictionary x:Key="Dark">
+            <Color x:Key="RibbonBackgroundColor">#2b2f36</Color>
+            <Color x:Key="RibbonBorderColor">#3a4049</Color>
+            <Color x:Key="RibbonTabHoverColor">#333842</Color>
+            <Color x:Key="RibbonTabSelectedColor">#586378</Color>
+            <Color x:Key="RibbonButtonBackgroundColor">#3a4049</Color>
+            <Color x:Key="RibbonButtonPointerOverBackgroundColor">#444b57</Color>
+            <Color x:Key="RibbonButtonPressedBackgroundColor">#565e6c</Color>
+            <SolidColorBrush x:Key="RibbonBackgroundBrush"
+                             Color="{StaticResource RibbonBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonBorderBrush"
+                             Color="{StaticResource RibbonBorderColor}" />
+            <SolidColorBrush x:Key="RibbonTabHoverBrush"
+                             Color="{StaticResource RibbonTabHoverColor}" />
+            <SolidColorBrush x:Key="RibbonTabSelectedBrush"
+                             Color="{StaticResource RibbonTabSelectedColor}" />
+            <SolidColorBrush x:Key="RibbonButtonBackgroundBrush"
+                             Color="{StaticResource RibbonButtonBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonButtonPointerOverBackgroundBrush"
+                             Color="{StaticResource RibbonButtonPointerOverBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonButtonPressedBackgroundBrush"
+                             Color="{StaticResource RibbonButtonPressedBackgroundColor}" />
+          </ResourceDictionary>
+
+          <!-- Fallback (used when ThemeVariant is Default) -->
+          <ResourceDictionary x:Key="Default">
+            <Color x:Key="RibbonBackgroundColor">#f2f4f7</Color>
+            <Color x:Key="RibbonBorderColor">#d0d6dd</Color>
+            <Color x:Key="RibbonTabHoverColor">#f1f2f4</Color>
+            <Color x:Key="RibbonTabSelectedColor">#b7bcc7</Color>
+            <Color x:Key="RibbonButtonBackgroundColor">#ffffffff</Color>
+            <Color x:Key="RibbonButtonPointerOverBackgroundColor">#fff0f0f0</Color>
+            <Color x:Key="RibbonButtonPressedBackgroundColor">#ffe0e0e0</Color>
+            <SolidColorBrush x:Key="RibbonBackgroundBrush"
+                             Color="{StaticResource RibbonBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonBorderBrush"
+                             Color="{StaticResource RibbonBorderColor}" />
+            <SolidColorBrush x:Key="RibbonTabHoverBrush"
+                             Color="{StaticResource RibbonTabHoverColor}" />
+            <SolidColorBrush x:Key="RibbonTabSelectedBrush"
+                             Color="{StaticResource RibbonTabSelectedColor}" />
+            <SolidColorBrush x:Key="RibbonButtonBackgroundBrush"
+                             Color="{StaticResource RibbonButtonBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonButtonPointerOverBackgroundBrush"
+                             Color="{StaticResource RibbonButtonPointerOverBackgroundColor}" />
+            <SolidColorBrush x:Key="RibbonButtonPressedBackgroundBrush"
+                             Color="{StaticResource RibbonButtonPressedBackgroundColor}" />
+          </ResourceDictionary>
+        </ResourceDictionary.ThemeDictionaries>
+      </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>

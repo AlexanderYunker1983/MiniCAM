@@ -9,13 +9,15 @@
         x:DataType="vm:MainViewModel"
         Icon="/Assets/CNC.ico"
         WindowStartupLocation="CenterScreen">
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="{Binding MenuSettingsText}">
-                <MenuItem Header="{Binding MenuApplicationSettingsText}" 
-                          Command="{Binding OpenApplicationSettingsCommand}"/>
-            </MenuItem>
-        </Menu>
-        <views:MainView />
-    </DockPanel>
+  <DockPanel>
+    <Menu DockPanel.Dock="Top"
+          FontSize="12">
+      <MenuItem Header="{Binding MenuSettingsText}">
+        <MenuItem Header="{Binding MenuApplicationSettingsText}"
+                  Command="{Binding OpenApplicationSettingsCommand}" />
+      </MenuItem>
+    </Menu>
+
+    <views:MainView />
+  </DockPanel>
 </Window>
