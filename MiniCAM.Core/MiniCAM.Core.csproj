@@ -11,6 +11,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Localization\Resources.resx">
+      <Generator></Generator>
+      <LastGenOutput></LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Resources.ru.resx">
+      <Generator></Generator>
+      <LastGenOutput></LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />

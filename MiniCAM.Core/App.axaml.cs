@@ -3,7 +3,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
+using MiniCAM.Core.Settings;
 using Avalonia.Markup.Xaml;
+using MiniCAM.Core.Localization;
 using MiniCAM.Core.ViewModels;
 using MiniCAM.Core.Views;
 
@@ -13,6 +15,9 @@ public partial class App : Application
 {
     public override void Initialize()
     {
+        // Initialize localization before loading XAML
+        LocalizationInitializer.Initialize();
+        
         AvaloniaXamlLoader.Load(this);
     }
 
@@ -27,15 +32,11 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel()
             };
-        }
-        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        {
-            singleViewPlatform.MainView = new MainView
-            {
-                DataContext = new MainViewModel()
-            };
-        }
 
+            // Apply theme from settings after main window is created
+            ThemeInitializer.Initialize();
+        }
+        
         base.OnFrameworkInitializationCompleted();
     }
 
