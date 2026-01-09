@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Localization = MiniCAM.Core.Localization;
+using MiniCAM.Core.Localization;
 using MiniCAM.Core.ViewModels;
 
 namespace MiniCAM.Core.Views;
@@ -13,7 +14,21 @@ public partial class CodeGenerationSettingsWindow : Window
         DataContext = new CodeGenerationSettingsViewModel();
         Closed += OnClosed;
         
-        // Set tab headers text
+        // Subscribe to culture changes to update tab headers
+        Localization.Resources.CultureChanged += OnCultureChanged;
+        
+        // Set initial tab headers text
+        UpdateTabHeaders();
+    }
+
+    private void OnCultureChanged(object? sender, CultureChangedEventArgs e)
+    {
+        Title = Localization.Resources.CodeGenerationSettingsTitle;
+        UpdateTabHeaders();
+    }
+
+    private void UpdateTabHeaders()
+    {
         if (this.FindControl<TextBlock>("TabCodeGenerationText") is { } codeGenTab)
         {
             codeGenTab.Text = Localization.Resources.TabCodeGeneration;
@@ -32,6 +47,7 @@ public partial class CodeGenerationSettingsWindow : Window
 
     private void OnClosed(object? sender, System.EventArgs e)
     {
+        Localization.Resources.CultureChanged -= OnCultureChanged;
         if (DataContext is CodeGenerationSettingsViewModel viewModel)
         {
             viewModel.Dispose();

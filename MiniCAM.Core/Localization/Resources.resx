@@ -256,5 +256,17 @@
   <data name="CodeGenZ" xml:space="preserve">
     <value>Z</value>
   </data>
+  <data name="OperationProperties" xml:space="preserve">
+    <value>Operation Properties</value>
+  </data>
+  <data name="Preview2D" xml:space="preserve">
+    <value>2D Preview</value>
+  </data>
+  <data name="OperationsList" xml:space="preserve">
+    <value>Operations List</value>
+  </data>
+  <data name="GCode" xml:space="preserve">
+    <value>G-code</value>
+  </data>
 </root>
 

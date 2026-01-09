@@ -21,6 +21,8 @@
             <Color x:Key="RibbonButtonBackgroundColor">#ffffffff</Color>
             <Color x:Key="RibbonButtonPointerOverBackgroundColor">#fff0f0f0</Color>
             <Color x:Key="RibbonButtonPressedBackgroundColor">#ffe0e0e0</Color>
+            <Color x:Key="GridSplitterColor">#666666</Color>
+            <Color x:Key="TabContentBorderColor">#d0d6dd</Color>
             <SolidColorBrush x:Key="RibbonBackgroundBrush"
                              Color="{StaticResource RibbonBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonBorderBrush"
@@ -35,6 +37,10 @@
                              Color="{StaticResource RibbonButtonPointerOverBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonButtonPressedBackgroundBrush"
                              Color="{StaticResource RibbonButtonPressedBackgroundColor}" />
+            <SolidColorBrush x:Key="GridSplitterBrush"
+                             Color="{StaticResource GridSplitterColor}" />
+            <SolidColorBrush x:Key="TabContentBorderBrush"
+                             Color="{StaticResource TabContentBorderColor}" />
           </ResourceDictionary>
 
           <!-- Dark theme colors -->
@@ -46,6 +52,8 @@
             <Color x:Key="RibbonButtonBackgroundColor">#3a4049</Color>
             <Color x:Key="RibbonButtonPointerOverBackgroundColor">#444b57</Color>
             <Color x:Key="RibbonButtonPressedBackgroundColor">#565e6c</Color>
+            <Color x:Key="GridSplitterColor">#888888</Color>
+            <Color x:Key="TabContentBorderColor">#3a4049</Color>
             <SolidColorBrush x:Key="RibbonBackgroundBrush"
                              Color="{StaticResource RibbonBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonBorderBrush"
@@ -60,6 +68,10 @@
                              Color="{StaticResource RibbonButtonPointerOverBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonButtonPressedBackgroundBrush"
                              Color="{StaticResource RibbonButtonPressedBackgroundColor}" />
+            <SolidColorBrush x:Key="GridSplitterBrush"
+                             Color="{StaticResource GridSplitterColor}" />
+            <SolidColorBrush x:Key="TabContentBorderBrush"
+                             Color="{StaticResource TabContentBorderColor}" />
           </ResourceDictionary>
 
           <!-- Fallback (used when ThemeVariant is Default) -->
@@ -71,6 +83,8 @@
             <Color x:Key="RibbonButtonBackgroundColor">#ffffffff</Color>
             <Color x:Key="RibbonButtonPointerOverBackgroundColor">#fff0f0f0</Color>
             <Color x:Key="RibbonButtonPressedBackgroundColor">#ffe0e0e0</Color>
+            <Color x:Key="GridSplitterColor">#666666</Color>
+            <Color x:Key="TabContentBorderColor">#d0d6dd</Color>
             <SolidColorBrush x:Key="RibbonBackgroundBrush"
                              Color="{StaticResource RibbonBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonBorderBrush"
@@ -85,6 +99,10 @@
                              Color="{StaticResource RibbonButtonPointerOverBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonButtonPressedBackgroundBrush"
                              Color="{StaticResource RibbonButtonPressedBackgroundColor}" />
+            <SolidColorBrush x:Key="GridSplitterBrush"
+                             Color="{StaticResource GridSplitterColor}" />
+            <SolidColorBrush x:Key="TabContentBorderBrush"
+                             Color="{StaticResource TabContentBorderColor}" />
           </ResourceDictionary>
         </ResourceDictionary.ThemeDictionaries>
       </ResourceDictionary>
@@ -92,5 +110,43 @@
 
     <Application.Styles>
         <FluentTheme />
+        
+        <!-- Default styles for all TabControl (same as RibbonTabs) -->
+        <Style Selector="TabControl > TabItem">
+          <Setter Property="Padding" Value="8 4" />
+          <Setter Property="MinHeight" Value="28" />
+          <Setter Property="CornerRadius" Value="8,8,0,0" />
+          <Setter Property="FontSize" Value="14" />
+          <Setter Property="HorizontalContentAlignment" Value="Center" />
+          <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <!-- Base state: gray border around the tab header (applies to all tabs including unselected) -->
+        <Style Selector="TabControl > TabItem /template/ Border#PART_LayoutRoot">
+          <Setter Property="BorderBrush" Value="{DynamicResource RibbonBorderBrush}" />
+          <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- Unselected tab state (explicit) -->
+        <Style Selector="TabControl > TabItem:not(:selected) /template/ Border#PART_LayoutRoot">
+          <Setter Property="BorderBrush" Value="{DynamicResource RibbonBorderBrush}" />
+          <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="TabControl > TabItem:pointerover /template/ Border#PART_LayoutRoot">
+          <Setter Property="Background" Value="{DynamicResource RibbonTabHoverBrush}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource RibbonBorderBrush}" />
+          <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="TabControl > TabItem:selected /template/ Border#PART_LayoutRoot">
+          <Setter Property="Background" Value="{DynamicResource RibbonTabSelectedBrush}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource RibbonBorderBrush}" />
+          <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="TabItem:selected /template/ Border#PART_SelectedPipe">
+          <Setter Property="IsVisible" Value="False" />
+        </Style>
     </Application.Styles>
 </Application>

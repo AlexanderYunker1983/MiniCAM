@@ -59,6 +59,15 @@
   <Style Selector="TabItem:selected /template/ Border#PART_SelectedPipe">
     <Setter Property="IsVisible" Value="False" />
   </Style>
+
+  <!-- Style for GridSplitter -->
+  <Style Selector="GridSplitter">
+    <Setter Property="Width" Value="2" />
+    <Setter Property="MinWidth" Value="2" />
+    <Setter Property="MaxWidth" Value="2" />
+    <Setter Property="Background" Value="{DynamicResource GridSplitterBrush}" />
+    <Setter Property="Cursor" Value="SizeWestEast" />
+  </Style>
 </Styles>
 
 

@@ -315,4 +315,16 @@
   <data name="CodeGenZ" xml:space="preserve">
     <value>Z</value>
   </data>
+  <data name="OperationProperties" xml:space="preserve">
+    <value>Свойства операции</value>
+  </data>
+  <data name="Preview2D" xml:space="preserve">
+    <value>2D-предпросмотр</value>
+  </data>
+  <data name="OperationsList" xml:space="preserve">
+    <value>Список операций</value>
+  </data>
+  <data name="GCode" xml:space="preserve">
+    <value>G-code</value>
+  </data>
 </root>

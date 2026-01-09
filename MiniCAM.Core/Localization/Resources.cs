@@ -153,6 +153,12 @@ public static class Resources
     public static string CodeGenX => GetString(nameof(CodeGenX), "X");
     public static string CodeGenY => GetString(nameof(CodeGenY), "Y");
     public static string CodeGenZ => GetString(nameof(CodeGenZ), "Z");
+    
+    // Main view strings
+    public static string OperationProperties => GetString(nameof(OperationProperties), "Operation Properties");
+    public static string Preview2D => GetString(nameof(Preview2D), "2D Preview");
+    public static string OperationsList => GetString(nameof(OperationsList), "Operations List");
+    public static string GCode => GetString(nameof(GCode), "G-code");
 }
 
 /// <summary>
