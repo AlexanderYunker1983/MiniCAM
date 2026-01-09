@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Styling;
 
@@ -11,21 +12,23 @@ public static class ThemeInitializer
     /// <summary>
     /// Applies theme from current settings (or defaults).
     /// </summary>
-    public static void Initialize()
+    /// <param name="settingsService">Settings service instance.</param>
+    public static void Initialize(ISettingsService settingsService)
     {
-        var settings = SettingsManager.Current;
+        var settings = settingsService.Current;
         var theme = string.IsNullOrWhiteSpace(settings.Theme)
             ? AppSettings.ThemeAuto
             : settings.Theme;
 
-        ApplyTheme(theme);
+        ApplyTheme(theme, settingsService);
     }
 
     /// <summary>
     /// Applies specified theme and saves it to settings.
     /// </summary>
     /// <param name="theme">"auto", "light", "dark".</param>
-    public static void ApplyTheme(string theme)
+    /// <param name="settingsService">Settings service instance.</param>
+    public static void ApplyTheme(string theme, ISettingsService settingsService)
     {
         if (Application.Current is { } app)
         {
@@ -37,9 +40,18 @@ public static class ThemeInitializer
             };
         }
 
-        var settings = SettingsManager.Current;
-        settings.Theme = theme;
-        SettingsManager.SaveCurrent();
+        try
+        {
+            var settings = settingsService.Current;
+            settings.Theme = theme;
+            settingsService.SaveCurrent();
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't prevent theme change
+            // Theme is already applied to UI, settings will be saved on next successful save operation
+            System.Diagnostics.Debug.WriteLine($"Failed to save theme setting: {ex.Message}");
+        }
     }
 }
 

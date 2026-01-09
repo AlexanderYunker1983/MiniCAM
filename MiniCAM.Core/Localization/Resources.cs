@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Resources;
+using MiniCAM.Core.Settings;
 
 namespace MiniCAM.Core.Localization;
 
@@ -68,8 +69,17 @@ public static class Resources
         }
         catch (CultureNotFoundException)
         {
-            // Fallback to default culture if specified culture is not found
-            CurrentCulture = CultureInfo.InvariantCulture;
+            // Fallback to English culture if specified culture is not found
+            // This ensures localized strings are still available
+            try
+            {
+                CurrentCulture = new CultureInfo(Settings.AppSettings.CultureEnglish);
+            }
+            catch
+            {
+                // Last resort: use InvariantCulture only if English also fails
+                CurrentCulture = CultureInfo.InvariantCulture;
+            }
         }
     }
 

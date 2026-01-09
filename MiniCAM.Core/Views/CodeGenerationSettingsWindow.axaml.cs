@@ -1,17 +1,22 @@
+using System;
 using Avalonia.Controls;
 using Localization = MiniCAM.Core.Localization;
 using MiniCAM.Core.Localization;
+using MiniCAM.Core.Settings;
 using MiniCAM.Core.ViewModels;
 
 namespace MiniCAM.Core.Views;
 
 public partial class CodeGenerationSettingsWindow : Window
 {
-    public CodeGenerationSettingsWindow()
+    public CodeGenerationSettingsWindow(ISettingsService settingsService)
     {
+        if (settingsService == null)
+            throw new ArgumentNullException(nameof(settingsService));
+            
         InitializeComponent();
         Title = Localization.Resources.CodeGenerationSettingsTitle;
-        DataContext = new CodeGenerationSettingsViewModel();
+        DataContext = new CodeGenerationSettingsViewModel(settingsService);
         Closed += OnClosed;
         
         // Subscribe to culture changes to update tab headers

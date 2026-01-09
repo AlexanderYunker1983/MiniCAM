@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using MiniCAM.Core.Settings;
 
@@ -36,11 +37,11 @@ public static class LocalizationInitializer
     /// <summary>
     /// Initializes the application culture based on saved settings, system settings, or default.
     /// </summary>
-    public static void Initialize()
+    /// <param name="settingsService">Settings service instance.</param>
+    public static void Initialize(ISettingsService settingsService)
     {
-        // Load settings (this also initializes SettingsManager.Current)
-        SettingsManager.Reload();
-        var settings = SettingsManager.Current;
+        settingsService.Reload();
+        var settings = settingsService.Current;
         
         string cultureToUse;
         
@@ -52,7 +53,7 @@ public static class LocalizationInitializer
             
             // Save auto as default setting
             settings.Culture = AppSettings.CultureAuto;
-            SettingsManager.SaveCurrent();
+            settingsService.SaveCurrent();
         }
         else if (settings.Culture == AppSettings.CultureAuto)
         {
@@ -70,11 +71,21 @@ public static class LocalizationInitializer
         {
             Resources.SetCulture(cultureToUse);
         }
-        catch (CultureNotFoundException)
+        catch (CultureNotFoundException ex)
         {
             // If culture is invalid, fall back to system detection
             cultureToUse = DetectSystemCulture();
-            Resources.SetCulture(cultureToUse);
+            try
+            {
+                Resources.SetCulture(cultureToUse);
+            }
+            catch (Exception fallbackEx)
+            {
+                // If even fallback fails, use English as last resort
+                // Don't throw here - we need application to start even if culture setting fails
+                Resources.SetCulture(AppSettings.CultureEnglish);
+                System.Diagnostics.Debug.WriteLine($"Failed to set culture. Requested: {cultureToUse}, Fallback failed: {fallbackEx.Message}");
+            }
         }
     }
 
@@ -82,9 +93,10 @@ public static class LocalizationInitializer
     /// Initializes the application culture with the specified culture name.
     /// </summary>
     /// <param name="cultureName">Culture name (e.g., "auto", "en-US", "ru-RU").</param>
-    public static void Initialize(string cultureName)
+    /// <param name="settingsService">Settings service instance.</param>
+    public static void Initialize(string cultureName, ISettingsService settingsService)
     {
-        SwitchCulture(cultureName);
+        SwitchCulture(cultureName, settingsService);
     }
 
     /// <summary>
@@ -92,7 +104,8 @@ public static class LocalizationInitializer
     /// This method can be called during application execution to change the language.
     /// </summary>
     /// <param name="cultureName">Culture name (e.g., "auto", "en-US", "ru-RU").</param>
-    public static void SwitchCulture(string cultureName)
+    /// <param name="settingsService">Settings service instance.</param>
+    public static void SwitchCulture(string cultureName, ISettingsService settingsService)
     {
         string cultureToUse;
         
@@ -112,17 +125,35 @@ public static class LocalizationInitializer
         {
             Resources.SetCulture(cultureToUse);
         }
-        catch (CultureNotFoundException)
+        catch (CultureNotFoundException ex)
         {
             // If culture is invalid, fall back to system detection
             cultureToUse = DetectSystemCulture();
-            Resources.SetCulture(cultureToUse);
+            try
+            {
+                Resources.SetCulture(cultureToUse);
+            }
+            catch (Exception fallbackEx)
+            {
+                // If even fallback fails, use English as last resort
+                Resources.SetCulture(AppSettings.CultureEnglish);
+                // Don't throw here - continue with English culture
+            }
         }
         
         // Save to settings (save the original value, not the resolved one)
-        var settings = SettingsManager.Current;
-        settings.Culture = cultureName;
-        SettingsManager.SaveCurrent();
+        try
+        {
+            var settings = settingsService.Current;
+            settings.Culture = cultureName;
+            settingsService.SaveCurrent();
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't prevent culture change
+            // Settings will be saved on next successful save operation
+            System.Diagnostics.Debug.WriteLine($"Failed to save culture setting: {ex.Message}");
+        }
     }
 }
 

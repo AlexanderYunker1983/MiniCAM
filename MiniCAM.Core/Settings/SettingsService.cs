@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace MiniCAM.Core.Settings;
 
@@ -15,13 +17,16 @@ public class SettingsService : ISettingsService
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
+    private readonly ILogger<SettingsService>? _logger;
     private AppSettings _current;
 
     /// <summary>
     /// Initializes a new instance of the SettingsService class.
     /// </summary>
-    public SettingsService()
+    /// <param name="logger">Optional logger instance for error logging.</param>
+    public SettingsService(ILogger<SettingsService>? logger = null)
     {
+        _logger = logger;
         _current = Load();
     }
 
@@ -87,18 +92,42 @@ public class SettingsService : ISettingsService
         
         if (!File.Exists(settingsPath))
         {
+            _logger?.LogDebug("Settings file not found at {SettingsPath}, using default settings", settingsPath);
             return new AppSettings();
         }
 
         try
         {
-            var json = File.ReadAllText(settingsPath);
+            var json = File.ReadAllText(settingsPath, Encoding.UTF8);
             var settings = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
-            return settings ?? new AppSettings();
+            
+            if (settings == null)
+            {
+                _logger?.LogWarning("Failed to deserialize settings from {SettingsPath}, using default settings", settingsPath);
+                return new AppSettings();
+            }
+            
+            _logger?.LogDebug("Settings loaded successfully from {SettingsPath}", settingsPath);
+            return settings;
         }
-        catch (Exception)
+        catch (JsonException ex)
         {
-            // If loading fails, return default settings
+            _logger?.LogError(ex, "Invalid JSON format in settings file {SettingsPath}, using default settings", settingsPath);
+            return new AppSettings();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger?.LogError(ex, "Access denied when reading settings file {SettingsPath}, using default settings", settingsPath);
+            return new AppSettings();
+        }
+        catch (IOException ex)
+        {
+            _logger?.LogError(ex, "IO error when reading settings file {SettingsPath}, using default settings", settingsPath);
+            return new AppSettings();
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Unexpected error when loading settings from {SettingsPath}, using default settings", settingsPath);
             return new AppSettings();
         }
     }
@@ -107,6 +136,7 @@ public class SettingsService : ISettingsService
     /// Saves application settings to disk.
     /// </summary>
     /// <param name="settings">Settings to save.</param>
+    /// <exception cref="ArgumentNullException">Thrown when settings is null.</exception>
     private void Save(AppSettings settings)
     {
         if (settings == null)
@@ -114,16 +144,52 @@ public class SettingsService : ISettingsService
             throw new ArgumentNullException(nameof(settings));
         }
 
+        var settingsPath = GetSettingsFilePath();
+        
         try
         {
-            var settingsPath = GetSettingsFilePath();
+            // Ensure directory exists before saving
+            var settingsDir = GetSettingsDirectory();
+            
             var json = JsonSerializer.Serialize(settings, JsonOptions);
-            File.WriteAllText(settingsPath, json);
+            File.WriteAllText(settingsPath, json, Encoding.UTF8);
+            _logger?.LogDebug("Settings saved successfully to {SettingsPath}", settingsPath);
         }
-        catch (Exception)
+        catch (UnauthorizedAccessException ex)
         {
-            // Silently fail if saving is not possible
-            // In production, you might want to log this
+            _logger?.LogError(ex, "Access denied when saving settings to {SettingsPath}. Settings were not saved.", settingsPath);
+            // Note: For backward compatibility, we don't throw here, but log the error.
+            // In future versions, consider returning a result or throwing to allow caller to handle.
+        }
+        catch (DirectoryNotFoundException ex)
+        {
+            _logger?.LogError(ex, "Directory not found when saving settings to {SettingsPath}. Attempting to create directory.", settingsPath);
+            try
+            {
+                var settingsDir = GetSettingsDirectory();
+                var json = JsonSerializer.Serialize(settings, JsonOptions);
+                File.WriteAllText(settingsPath, json, Encoding.UTF8);
+                _logger?.LogInformation("Settings saved successfully after creating directory {SettingsPath}", settingsPath);
+            }
+            catch (Exception retryEx)
+            {
+                _logger?.LogError(retryEx, "Failed to save settings after directory creation attempt to {SettingsPath}", settingsPath);
+            }
+        }
+        catch (IOException ex)
+        {
+            _logger?.LogError(ex, "IO error when saving settings to {SettingsPath}. Settings were not saved.", settingsPath);
+            // Note: For backward compatibility, we don't throw here, but log the error.
+        }
+        catch (JsonException ex)
+        {
+            _logger?.LogError(ex, "JSON serialization error when saving settings to {SettingsPath}. This indicates a problem with the settings object.", settingsPath);
+            // Note: This should not happen in normal operation. Consider throwing in future versions.
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Unexpected error when saving settings to {SettingsPath}. Settings were not saved.", settingsPath);
+            // Note: For backward compatibility, we don't throw here, but log the error.
         }
     }
 }

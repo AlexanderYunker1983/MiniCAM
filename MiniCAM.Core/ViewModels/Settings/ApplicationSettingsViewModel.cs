@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Media;
@@ -15,6 +16,7 @@ namespace MiniCAM.Core.ViewModels;
 /// </summary>
 public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
 {
+    private readonly ISettingsService _settingsService;
     private const string PropertyLanguage = nameof(SelectedLanguage);
     private const string PropertyTheme = nameof(SelectedTheme);
 
@@ -36,17 +38,18 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
     [ObservableProperty]
     private string _themeLabel = Resources.ThemeLabel;
 
-    [ObservableProperty]
-    private string _languageHeaderText = Resources.LanguageLabel;
+    // Property headers dictionary for change tracking
+    private readonly Dictionary<string, PropertyHeaderViewModel> _headers = new();
 
-    [ObservableProperty]
-    private string _themeHeaderText = Resources.ThemeLabel;
+    /// <summary>
+    /// Gets the header view model for language property.
+    /// </summary>
+    public PropertyHeaderViewModel LanguageHeader => _headers[PropertyLanguage];
 
-    [ObservableProperty]
-    private FontStyle _languageHeaderFontStyle = FontStyle.Normal;
-
-    [ObservableProperty]
-    private FontStyle _themeHeaderFontStyle = FontStyle.Normal;
+    /// <summary>
+    /// Gets the header view model for theme property.
+    /// </summary>
+    public PropertyHeaderViewModel ThemeHeader => _headers[PropertyTheme];
 
     [ObservableProperty]
     private string _applyButtonText = Resources.ButtonApply;
@@ -54,8 +57,14 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
     [ObservableProperty]
     private string _resetButtonText = Resources.ButtonReset;
 
-    public ApplicationSettingsViewModel()
+    public ApplicationSettingsViewModel(ISettingsService settingsService)
     {
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        
+        // Initialize headers
+        _headers[PropertyLanguage] = new PropertyHeaderViewModel(Resources.LanguageLabel);
+        _headers[PropertyTheme] = new PropertyHeaderViewModel(Resources.ThemeLabel);
+        
         BuildLanguages();
         BuildThemes();
         LoadFromSettings();
@@ -106,15 +115,13 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
             PropertyLanguage,
             currentCulture,
             () => Resources.LanguageLabel,
-            value => LanguageHeaderText = value,
-            value => LanguageHeaderFontStyle = value);
+            _headers[PropertyLanguage]);
 
         HeaderTracker.Register(
             PropertyTheme,
             currentTheme,
             () => Resources.ThemeLabel,
-            value => ThemeHeaderText = value,
-            value => ThemeHeaderFontStyle = value);
+            _headers[PropertyTheme]);
     }
 
     private void BuildLanguages()
@@ -169,7 +176,7 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
 
     private void LoadFromSettings()
     {
-        LoadFromSettings(SettingsManager.Current);
+        LoadFromSettings(_settingsService.Current);
     }
 
     private void SetSelectedCulture(string cultureName)
@@ -192,16 +199,16 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
     private void Apply()
     {
         var culture = SelectedLanguage?.Key ?? AppSettings.CultureAuto;
-        LocalizationInitializer.SwitchCulture(culture);
+        LocalizationInitializer.SwitchCulture(culture, _settingsService);
 
         var theme = SelectedTheme?.Key ?? AppSettings.ThemeAuto;
-        ThemeInitializer.ApplyTheme(theme);
+        ThemeInitializer.ApplyTheme(theme, _settingsService);
 
         // Save to settings
-        var settings = SettingsManager.Current;
+        var settings = _settingsService.Current;
         settings.Culture = culture;
         settings.Theme = theme;
-        SettingsManager.SaveCurrent();
+        _settingsService.SaveCurrent();
 
         // Update original values in tracker (settings now contain the saved values)
         HeaderTracker.UpdateOriginal(PropertyLanguage, culture);
@@ -211,24 +218,24 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
     [RelayCommand]
     private void Reset()
     {
-        SettingsManager.Reload();
-        var culture = SettingsManager.Current.Culture;
+        _settingsService.Reload();
+        var culture = _settingsService.Current.Culture;
         if (string.IsNullOrWhiteSpace(culture))
         {
             culture = AppSettings.CultureAuto;
         }
 
         SetSelectedCulture(culture);
-        LocalizationInitializer.SwitchCulture(culture);
+        LocalizationInitializer.SwitchCulture(culture, _settingsService);
 
-        var theme = SettingsManager.Current.Theme;
+        var theme = _settingsService.Current.Theme;
         if (string.IsNullOrWhiteSpace(theme))
         {
             theme = AppSettings.ThemeAuto;
         }
 
         SetSelectedTheme(theme);
-        ThemeInitializer.ApplyTheme(theme);
+        ThemeInitializer.ApplyTheme(theme, _settingsService);
 
         // Update original values in tracker
         HeaderTracker.UpdateOriginal(PropertyLanguage, culture);
@@ -246,37 +253,15 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
         HeaderTracker.Update(PropertyTheme, newValue?.Key ?? AppSettings.ThemeAuto);
     }
 
-    partial void OnLanguageLabelChanged(string value)
-    {
-        HeaderTracker.UpdateAllHeaders();
-    }
-
-    partial void OnThemeLabelChanged(string value)
-    {
-        HeaderTracker.UpdateAllHeaders();
-    }
 
     // Implementation of abstract methods from SettingsTabViewModelBase
     public override void LoadFromSettings(AppSettings settings)
     {
-        var culture = settings.Culture;
-        if (string.IsNullOrWhiteSpace(culture))
-        {
-            culture = AppSettings.CultureAuto;
-        }
-
+        var culture = LoadStringProperty(settings, s => s.Culture, AppSettings.CultureAuto, PropertyLanguage, _ => { });
         SetSelectedCulture(culture);
 
-        var theme = settings.Theme;
-        if (string.IsNullOrWhiteSpace(theme))
-        {
-            theme = AppSettings.ThemeAuto;
-        }
-
+        var theme = LoadStringProperty(settings, s => s.Theme, AppSettings.ThemeAuto, PropertyTheme, _ => { });
         SetSelectedTheme(theme);
-
-        HeaderTracker.UpdateOriginal(PropertyLanguage, culture);
-        HeaderTracker.UpdateOriginal(PropertyTheme, theme);
     }
 
     public override void SaveToSettings(AppSettings settings)
@@ -287,53 +272,16 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
 
     public override void ResetToOriginal()
     {
-        var originalCulture = HeaderTracker.GetOriginalValue<string>(PropertyLanguage) ?? AppSettings.CultureAuto;
-        var originalTheme = HeaderTracker.GetOriginalValue<string>(PropertyTheme) ?? AppSettings.ThemeAuto;
-
+        var originalCulture = ResetStringProperty(PropertyLanguage, AppSettings.CultureAuto, _ => { });
         SetSelectedCulture(originalCulture);
+
+        var originalTheme = ResetStringProperty(PropertyTheme, AppSettings.ThemeAuto, _ => { });
         SetSelectedTheme(originalTheme);
 
-        LocalizationInitializer.SwitchCulture(originalCulture);
-        ThemeInitializer.ApplyTheme(originalTheme);
+        LocalizationInitializer.SwitchCulture(originalCulture, _settingsService);
+        ThemeInitializer.ApplyTheme(originalTheme, _settingsService);
 
         HeaderTracker.UpdateAllHeadersImmediate();
-    }
-}
-
-/// <summary>
-/// Represents a language/culture option for application localization.
-/// </summary>
-public partial class LanguageOption : OptionBase
-{
-    /// <summary>
-    /// Gets the culture name (alias for Key for backward compatibility).
-    /// </summary>
-    public string CultureName => Key;
-
-    /// <summary>
-    /// Initializes a new instance of the LanguageOption class.
-    /// </summary>
-    /// <param name="cultureName">The culture name (e.g., "en-US", "ru-RU").</param>
-    /// <param name="displayName">The localized display name.</param>
-    public LanguageOption(string cultureName, string displayName)
-        : base(cultureName, displayName)
-    {
-    }
-}
-
-/// <summary>
-/// Represents a theme option for application appearance.
-/// </summary>
-public partial class ThemeOption : OptionBase
-{
-    /// <summary>
-    /// Initializes a new instance of the ThemeOption class.
-    /// </summary>
-    /// <param name="key">The theme key (e.g., "Auto", "Light", "Dark").</param>
-    /// <param name="displayName">The localized display name.</param>
-    public ThemeOption(string key, string displayName)
-        : base(key, displayName)
-    {
     }
 }
 

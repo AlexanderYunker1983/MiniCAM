@@ -58,6 +58,25 @@ public class HeaderPropertyTracker
     }
 
     /// <summary>
+    /// Registers a property for tracking with PropertyHeaderViewModel.
+    /// </summary>
+    public void Register<T>(
+        string propertyName,
+        T originalValue,
+        Func<string> getResourceString,
+        PropertyHeaderViewModel headerViewModel)
+    {
+        _properties[propertyName] = new PropertyHeaderInfo<T>
+        {
+            OriginalValue = originalValue,
+            CurrentValue = originalValue,
+            GetResourceString = getResourceString,
+            HeaderViewModel = headerViewModel
+        };
+        UpdateHeader(propertyName);
+    }
+
+    /// <summary>
     /// Updates the current value for a tracked property and updates its header.
     /// </summary>
     public void Update<T>(string propertyName, T currentValue)
@@ -227,16 +246,28 @@ internal class PropertyHeaderInfo<T> : PropertyHeaderInfo
     public T OriginalValue { get; set; } = default!;
     public T CurrentValue { get; set; } = default!;
     public Func<string> GetResourceString { get; set; } = null!;
-    public Action<string> SetHeaderText { get; set; } = null!;
-    public Action<FontStyle> SetFontStyle { get; set; } = null!;
+    public Action<string>? SetHeaderText { get; set; }
+    public Action<FontStyle>? SetFontStyle { get; set; }
+    public PropertyHeaderViewModel? HeaderViewModel { get; set; }
 
     public override void UpdateHeader()
     {
         var isModified = !Equals(CurrentValue, OriginalValue);
-        var headerText = isModified ? $"{GetResourceString()} *" : GetResourceString();
-        var fontStyle = isModified ? FontStyle.Italic : FontStyle.Normal;
-        SetHeaderText(headerText);
-        SetFontStyle(fontStyle);
+        var baseText = GetResourceString();
+
+        if (HeaderViewModel != null)
+        {
+            // New approach: use PropertyHeaderViewModel
+            HeaderViewModel.UpdateState(baseText, isModified);
+        }
+        else if (SetHeaderText != null && SetFontStyle != null)
+        {
+            // Legacy approach: use separate actions
+            var headerText = isModified ? $"{baseText} *" : baseText;
+            var fontStyle = isModified ? FontStyle.Italic : FontStyle.Normal;
+            SetHeaderText(headerText);
+            SetFontStyle(fontStyle);
+        }
     }
 
     public override void Reset()

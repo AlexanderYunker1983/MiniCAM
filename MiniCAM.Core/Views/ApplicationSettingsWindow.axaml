@@ -22,8 +22,8 @@
                  FontWeight="SemiBold" />
 
       <StackPanel Spacing="4">
-        <TextBlock Text="{Binding LanguageHeaderText}"
-                   FontStyle="{Binding LanguageHeaderFontStyle}" />
+        <TextBlock Text="{Binding LanguageHeader.Text}"
+                   FontStyle="{Binding LanguageHeader.FontStyle}" />
         <ComboBox ItemsSource="{Binding Languages}"
                   SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
                   HorizontalAlignment="Stretch">
@@ -36,8 +36,8 @@
       </StackPanel>
 
       <StackPanel Spacing="4">
-        <TextBlock Text="{Binding ThemeHeaderText}"
-                   FontStyle="{Binding ThemeHeaderFontStyle}" />
+        <TextBlock Text="{Binding ThemeHeader.Text}"
+                   FontStyle="{Binding ThemeHeader.FontStyle}" />
         <ComboBox ItemsSource="{Binding Themes}"
                   SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
                   HorizontalAlignment="Stretch">

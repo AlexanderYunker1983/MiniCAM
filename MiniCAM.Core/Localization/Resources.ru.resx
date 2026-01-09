@@ -196,10 +196,10 @@
     <value>Добавлять код управления СОЖ</value>
   </data>
   <data name="CoolantEnableAtStart" xml:space="preserve">
-    <value>Включать СОЖ в начале программы (М8)</value>
+    <value>Включать СОЖ в начале программы (M8)</value>
   </data>
   <data name="CoolantDisableAtEnd" xml:space="preserve">
-    <value>Выключать СОЖ в конце программы (М9)</value>
+    <value>Выключать СОЖ в конце программы (M9)</value>
   </data>
   <data name="SpindleAddCode" xml:space="preserve">
     <value>Добавлять код управления шпинделем</value>
@@ -217,10 +217,10 @@
     <value>Команда включения</value>
   </data>
   <data name="SpindleEnableCommandM3" xml:space="preserve">
-    <value>М3</value>
+    <value>M3</value>
   </data>
   <data name="SpindleEnableCommandM4" xml:space="preserve">
-    <value>М4</value>
+    <value>M4</value>
   </data>
   <data name="SpindleAddDelayAfterEnable" xml:space="preserve">
     <value>Добавлять задержку после включения (G4)</value>
@@ -241,7 +241,7 @@
     <value>Величина параметра</value>
   </data>
   <data name="SpindleDisableAfterOperations" xml:space="preserve">
-    <value>Выключать шпиндель после операций (М5)</value>
+    <value>Выключать шпиндель после операций (M5)</value>
   </data>
   <data name="CodeGenUseLineNumbers" xml:space="preserve">
     <value>Использовать номера строк (N...)</value>

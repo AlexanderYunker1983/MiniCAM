@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia;
@@ -6,6 +7,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MiniCAM.Core.Localization;
+using MiniCAM.Core.Settings;
 using MiniCAM.Core.Views;
 
 namespace MiniCAM.Core.ViewModels;
@@ -16,8 +18,12 @@ namespace MiniCAM.Core.ViewModels;
 /// </summary>
 public partial class MainViewModel : LocalizedViewModelBase
 {
-    public MainViewModel()
+    private readonly ISettingsService _settingsService;
+
+    public MainViewModel(ISettingsService settingsService)
     {
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        
         // Subscribe to collection changes to update command availability
         Operations.CollectionChanged += (s, e) => UpdateCommandAvailability();
         
@@ -98,7 +104,7 @@ public partial class MainViewModel : LocalizedViewModelBase
     {
         var settingsWindow = new ApplicationSettingsWindow
         {
-            DataContext = new ApplicationSettingsViewModel()
+            DataContext = new ApplicationSettingsViewModel(_settingsService)
         };
 
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
@@ -111,7 +117,7 @@ public partial class MainViewModel : LocalizedViewModelBase
     [RelayCommand]
     private void OpenCodeGenerationSettings()
     {
-        var settingsWindow = new CodeGenerationSettingsWindow();
+        var settingsWindow = new CodeGenerationSettingsWindow(_settingsService);
 
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
         {

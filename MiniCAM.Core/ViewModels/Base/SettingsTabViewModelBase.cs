@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MiniCAM.Core.Localization;
@@ -81,6 +82,58 @@ public abstract class SettingsTabViewModelBase : ViewModelBase, IDisposable
     /// Resets to original values.
     /// </summary>
     public abstract void ResetToOriginal();
+
+    /// <summary>
+    /// Helper method to load a boolean property from settings and update the tracker.
+    /// </summary>
+    protected bool LoadBoolProperty(
+        AppSettings settings,
+        Expression<Func<AppSettings, bool?>> getter,
+        bool defaultValue,
+        string propertyName,
+        Action<bool> setter)
+    {
+        var value = settings.GetValueOrDefault(getter, defaultValue);
+        setter(value);
+        HeaderTracker.UpdateOriginal(propertyName, value);
+        return value;
+    }
+
+    /// <summary>
+    /// Helper method to load a string property from settings and update the tracker.
+    /// </summary>
+    protected string LoadStringProperty(
+        AppSettings settings,
+        Expression<Func<AppSettings, string?>> getter,
+        string defaultValue,
+        string propertyName,
+        Action<string> setter)
+    {
+        var value = settings.GetStringOrDefault(getter, defaultValue);
+        setter(value);
+        HeaderTracker.UpdateOriginal(propertyName, value);
+        return value;
+    }
+
+    /// <summary>
+    /// Helper method to reset a boolean property to its original value.
+    /// </summary>
+    protected bool ResetBoolProperty(string propertyName, bool defaultValue, Action<bool> setter)
+    {
+        var value = HeaderTracker.GetOriginalValue<bool>(propertyName);
+        setter(value);
+        return value;
+    }
+
+    /// <summary>
+    /// Helper method to reset a string property to its original value.
+    /// </summary>
+    protected string ResetStringProperty(string propertyName, string defaultValue, Action<string> setter)
+    {
+        var value = HeaderTracker.GetOriginalValue<string>(propertyName) ?? defaultValue;
+        setter(value);
+        return value;
+    }
 
     public virtual void Dispose()
     {

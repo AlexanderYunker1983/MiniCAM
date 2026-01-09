@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Avalonia;
 using MiniCAM.Core;
 
@@ -9,7 +9,10 @@ sealed class Program
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
+    // STAThread is Windows-specific and not required on Linux/macOS
+#if WINDOWS
     [STAThread]
+#endif
     public static void Main(string[] args) => BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);
 
