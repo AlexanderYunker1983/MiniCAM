@@ -169,6 +169,11 @@ public static class Resources
     public static string Preview2D => GetString(nameof(Preview2D), "2D Preview");
     public static string OperationsList => GetString(nameof(OperationsList), "Operations List");
     public static string GCode => GetString(nameof(GCode), "G-code");
+    public static string ButtonGenerate => GetString(nameof(ButtonGenerate), "Generate");
+    public static string ButtonSave => GetString(nameof(ButtonSave), "Save");
+    public static string GCodeProgram => GetString(nameof(GCodeProgram), "Program");
+    public static string GCodeFileCreated => GetString(nameof(GCodeFileCreated), "File created:");
+    public static string CodeGenDecimalPlaces => GetString(nameof(CodeGenDecimalPlaces), "Decimal places");
 }
 
 /// <summary>

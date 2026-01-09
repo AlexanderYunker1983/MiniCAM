@@ -1,11 +1,15 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MiniCAM.Core.CodeGeneration;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
 using MiniCAM.Core.Views;
@@ -26,11 +30,7 @@ public partial class MainViewModel : LocalizedViewModelBase
         
         // Subscribe to collection changes to update command availability
         Operations.CollectionChanged += (s, e) => UpdateCommandAvailability();
-        
-        // Initialize with sample operations
-        Operations.Add(new OperationItem("Drilling Operation 1"));
-        Operations.Add(new OperationItem("Drilling Operation 2"));
-        Operations.Add(new OperationItem("Pocket Operation 1"));
+        GCodeLines.CollectionChanged += (s, e) => UpdateGCodeCommandAvailability();
     }
 
     protected override void UpdateLocalizedStrings()
@@ -46,6 +46,8 @@ public partial class MainViewModel : LocalizedViewModelBase
         Preview2DText = Resources.Preview2D;
         OperationsListText = Resources.OperationsList;
         GCodeText = Resources.GCode;
+        GenerateButtonText = Resources.ButtonGenerate;
+        SaveButtonText = Resources.ButtonSave;
     }
 
     [ObservableProperty]
@@ -84,8 +86,17 @@ public partial class MainViewModel : LocalizedViewModelBase
     [ObservableProperty]
     private string _gCodeText = Resources.GCode;
 
+    [ObservableProperty]
+    private string _generateButtonText = Resources.ButtonGenerate;
+
+    [ObservableProperty]
+    private string _saveButtonText = Resources.ButtonSave;
+
     // Operations list
     public ObservableCollection<OperationItem> Operations { get; } = new();
+
+    // G-code lines list
+    public ObservableCollection<string> GCodeLines { get; } = new();
 
     [ObservableProperty]
     private OperationItem? _selectedOperation;
@@ -191,6 +202,82 @@ public partial class MainViewModel : LocalizedViewModelBase
         MoveOperationUpCommand.NotifyCanExecuteChanged();
         MoveOperationDownCommand.NotifyCanExecuteChanged();
         DeleteOperationCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool CanSaveGCode()
+    {
+        return GCodeLines.Count > 0;
+    }
+
+    private void UpdateGCodeCommandAvailability()
+    {
+        SaveGCodeCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand]
+    private void GenerateGCode()
+    {
+        GCodeLines.Clear();
+
+        // Get all settings needed for code generation
+        var appSettings = _settingsService.Current;
+        
+        // Create generator and generate G-code
+        // Generation will work even if there are no operations (will generate header and end)
+        var generator = new GCodeGenerator(appSettings.CodeGeneration, appSettings.Spindle, appSettings.Coolant);
+        var generatedLines = generator.Generate(Operations);
+        
+        // Add generated lines to collection
+        foreach (var line in generatedLines)
+        {
+            GCodeLines.Add(line);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSaveGCode))]
+    private async void SaveGCode()
+    {
+        if (GCodeLines.Count == 0) return;
+
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+        {
+            var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+            if (topLevel?.StorageProvider is { } storageProvider)
+            {
+                var file = await storageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                {
+                    Title = Resources.ButtonSave,
+                    SuggestedFileName = "program.nc",
+                    FileTypeChoices = new[]
+                    {
+                        new FilePickerFileType("G-code files")
+                        {
+                            Patterns = new[] { "*.nc", "*.ncc", "*.ngc", "*.tap", "*.gcode", "*.txt" }
+                        }
+                    }
+                });
+
+                if (file != null)
+                {
+                    try
+                    {
+                        await using var stream = await file.OpenWriteAsync();
+                        // Use UTF-8 encoding without BOM for G-code files (cross-platform compatible)
+                        using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+                        foreach (var line in GCodeLines)
+                        {
+                            await writer.WriteLineAsync(line);
+                        }
+                        await writer.FlushAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        // In a real application, you might want to show an error dialog
+                        System.Diagnostics.Debug.WriteLine($"Error saving file: {ex.Message}");
+                    }
+                }
+            }
+        }
     }
 }
 

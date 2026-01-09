@@ -64,4 +64,9 @@ public static class CodeGenerationDefaults
     /// Default value for MoveToPointAtEnd setting.
     /// </summary>
     public const bool MoveToPointAtEnd = false;
+
+    /// <summary>
+    /// Default number of decimal places for coordinates.
+    /// </summary>
+    public const int DecimalPlaces = 3;
 }

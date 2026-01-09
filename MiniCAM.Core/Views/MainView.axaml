@@ -222,13 +222,43 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     Margin="-11,0,0,0">
-              <ScrollViewer VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Auto"
-                          HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch">
-                <TextBlock Text="{Binding GCodeText}"
-                           Margin="4" />
-              </ScrollViewer>
+              <Grid RowDefinitions="Auto,*">
+                <!-- Toolbar with buttons -->
+                <Border Grid.Row="0"
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="{DynamicResource TabContentBorderBrush}"
+                        Padding="4">
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button Command="{Binding GenerateGCodeCommand}"
+                            Content="{Binding GenerateButtonText}"
+                            Padding="8,4" />
+                    <Button Command="{Binding SaveGCodeCommand}"
+                            Content="{Binding SaveButtonText}"
+                            Padding="8,4" />
+                  </StackPanel>
+                </Border>
+                
+                <!-- G-code lines list -->
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding GCodeLines}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                  <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                      <Setter Property="MinHeight" Value="18" />
+                      <Setter Property="Padding" Value="0" />
+                    </Style>
+                  </ListBox.Styles>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding}"
+                                 FontFamily="Consolas, Courier New, monospace"
+                                 Margin="4,1"
+                                 VerticalAlignment="Center" />
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </Grid>
             </Border>
           </TabItem>
         </TabControl>

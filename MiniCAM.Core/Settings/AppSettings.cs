@@ -202,6 +202,12 @@ public class AppSettings
         set => CodeGeneration.Z = value;
     }
 
+    public int? DecimalPlaces
+    {
+        get => CodeGeneration.DecimalPlaces;
+        set => CodeGeneration.DecimalPlaces = value;
+    }
+
     // Spindle Settings (legacy properties)
     public bool? AddSpindleCode
     {

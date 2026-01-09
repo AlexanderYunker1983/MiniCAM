@@ -327,4 +327,19 @@
   <data name="GCode" xml:space="preserve">
     <value>G-code</value>
   </data>
+  <data name="ButtonGenerate" xml:space="preserve">
+    <value>Сгенерировать</value>
+  </data>
+  <data name="ButtonSave" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="GCodeProgram" xml:space="preserve">
+    <value>Program</value>
+  </data>
+  <data name="GCodeFileCreated" xml:space="preserve">
+    <value>Файл создан:</value>
+  </data>
+  <data name="CodeGenDecimalPlaces" xml:space="preserve">
+    <value>Количество знаков после запятой</value>
+  </data>
 </root>

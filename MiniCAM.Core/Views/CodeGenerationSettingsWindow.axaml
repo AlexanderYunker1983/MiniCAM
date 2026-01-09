@@ -85,6 +85,14 @@
                   </CheckBox.Content>
                 </CheckBox>
 
+                <!-- Decimal places -->
+                <StackPanel Spacing="4">
+                  <TextBlock Text="{Binding CodeGenDecimalPlacesHeader.Text}"
+                             FontStyle="{Binding CodeGenDecimalPlacesHeader.FontStyle}" />
+                  <TextBox Text="{Binding DecimalPlaces, Mode=TwoWay}"
+                            Watermark="3" />
+                </StackPanel>
+
                 <!-- Set work coordinate system -->
                 <CheckBox IsChecked="{Binding SetWorkCoordinateSystem, Mode=TwoWay}">
                   <CheckBox.Content>
@@ -217,7 +225,7 @@
                 
                 <!-- Set spindle speed -->
                 <CheckBox IsChecked="{Binding SetSpindleSpeed, Mode=TwoWay}"
-                          IsEnabled="{Binding IsSpindleSubOptionsEnabled}"
+                          IsEnabled="{Binding IsSpindleSpeedCheckboxEnabled}"
                           Margin="20,0,0,0">
                   <CheckBox.Content>
                     <TextBlock Text="{Binding SpindleSetSpeedHeader.Text}"

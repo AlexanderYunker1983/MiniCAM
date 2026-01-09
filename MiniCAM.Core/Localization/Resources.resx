@@ -268,5 +268,20 @@
   <data name="GCode" xml:space="preserve">
     <value>G-code</value>
   </data>
+  <data name="ButtonGenerate" xml:space="preserve">
+    <value>Generate</value>
+  </data>
+  <data name="ButtonSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="GCodeProgram" xml:space="preserve">
+    <value>Program</value>
+  </data>
+  <data name="GCodeFileCreated" xml:space="preserve">
+    <value>File created:</value>
+  </data>
+  <data name="CodeGenDecimalPlaces" xml:space="preserve">
+    <value>Decimal places</value>
+  </data>
 </root>
 

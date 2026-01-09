@@ -58,6 +58,9 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
     private bool _isSpindleSubOptionsEnabled;
 
     [ObservableProperty]
+    private bool _isSpindleSpeedCheckboxEnabled;
+
+    [ObservableProperty]
     private bool _isSpindleSpeedInputEnabled;
 
     [ObservableProperty]
@@ -217,7 +220,7 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
 
     partial void OnSetSpindleSpeedChanged(bool value)
     {
-        IsSpindleSpeedInputEnabled = SetSpindleSpeed && AddSpindleCode;
+        UpdateSpindleSpeedInputEnabled();
         HeaderTracker.Update(PropertySetSpindleSpeed, value);
     }
 
@@ -232,6 +235,8 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
         {
             IsSpindleDelaySubOptionsEnabled = AddSpindleDelayAfterEnable && EnableSpindleBeforeOperations && AddSpindleCode;
         }
+        // Update speed input enabled state when enable spindle changes
+        UpdateSpindleSpeedInputEnabled();
         HeaderTracker.Update(PropertyEnableSpindleBeforeOperations, value);
     }
 
@@ -272,9 +277,29 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
     private void UpdateSpindleDependentControls()
     {
         IsSpindleSubOptionsEnabled = AddSpindleCode;
-        IsSpindleSpeedInputEnabled = SetSpindleSpeed && AddSpindleCode;
+        UpdateSpindleSpeedControls();
         IsSpindleEnableSubOptionsEnabled = EnableSpindleBeforeOperations && AddSpindleCode;
         IsSpindleDelaySubOptionsEnabled = AddSpindleDelayAfterEnable && EnableSpindleBeforeOperations && AddSpindleCode;
+    }
+
+    /// <summary>
+    /// Updates the enabled state of spindle speed controls.
+    /// Speed checkbox is enabled when: AddSpindleCode and EnableSpindleBeforeOperations are true.
+    /// Speed input is enabled only when: AddSpindleCode, EnableSpindleBeforeOperations, and SetSpindleSpeed are all true.
+    /// </summary>
+    private void UpdateSpindleSpeedControls()
+    {
+        IsSpindleSpeedCheckboxEnabled = EnableSpindleBeforeOperations && AddSpindleCode;
+        IsSpindleSpeedInputEnabled = SetSpindleSpeed && EnableSpindleBeforeOperations && AddSpindleCode;
+    }
+
+    /// <summary>
+    /// Updates the enabled state of spindle speed input.
+    /// Speed input is enabled only when: AddSpindleCode, EnableSpindleBeforeOperations, and SetSpindleSpeed are all true.
+    /// </summary>
+    private void UpdateSpindleSpeedInputEnabled()
+    {
+        UpdateSpindleSpeedControls();
     }
 
     public override void LoadFromSettings(AppSettings settings)

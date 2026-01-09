@@ -34,6 +34,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     private const string PropertyX = nameof(X);
     private const string PropertyY = nameof(Y);
     private const string PropertyZ = nameof(Z);
+    private const string PropertyDecimalPlaces = nameof(DecimalPlaces);
 
     // Code generation properties
     [ObservableProperty]
@@ -90,6 +91,9 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     [ObservableProperty]
     private string _z = CodeGenerationDefaults.Coordinate;
 
+    [ObservableProperty]
+    private string _decimalPlaces = CodeGenerationDefaults.DecimalPlaces.ToString();
+
     // Enabled states for dependent controls
     [ObservableProperty]
     private bool _isLineNumberOptionsEnabled;
@@ -131,6 +135,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     public PropertyHeaderViewModel CodeGenXHeader => _headers[PropertyX];
     public PropertyHeaderViewModel CodeGenYHeader => _headers[PropertyY];
     public PropertyHeaderViewModel CodeGenZHeader => _headers[PropertyZ];
+    public PropertyHeaderViewModel CodeGenDecimalPlacesHeader => _headers[PropertyDecimalPlaces];
 
     public CodeGenerationTabViewModel(ISettingsService settingsService)
     {
@@ -156,6 +161,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         _headers[PropertyX] = new PropertyHeaderViewModel(Resources.CodeGenX);
         _headers[PropertyY] = new PropertyHeaderViewModel(Resources.CodeGenY);
         _headers[PropertyZ] = new PropertyHeaderViewModel(Resources.CodeGenZ);
+        _headers[PropertyDecimalPlaces] = new PropertyHeaderViewModel(Resources.CodeGenDecimalPlaces);
         
         InitializeCoordinateSystems();
         LoadFromSettings(_settingsService.Current);
@@ -175,6 +181,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         RegisterCoordinateModeProperties();
         RegisterInitialPositionProperties();
         RegisterEndPositionProperties();
+        RegisterDecimalPlacesProperty();
     }
 
     /// <summary>
@@ -239,6 +246,14 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         RegisterProperty(PropertyX, X, () => Resources.CodeGenX);
         RegisterProperty(PropertyY, Y, () => Resources.CodeGenY);
         RegisterProperty(PropertyZ, Z, () => Resources.CodeGenZ);
+    }
+
+    /// <summary>
+    /// Registers decimal places property for tracking.
+    /// </summary>
+    private void RegisterDecimalPlacesProperty()
+    {
+        RegisterProperty(PropertyDecimalPlaces, DecimalPlaces, () => Resources.CodeGenDecimalPlaces);
     }
 
     /// <summary>
@@ -365,6 +380,11 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         HeaderTracker.Update(PropertyZ, value);
     }
 
+    partial void OnDecimalPlacesChanged(string value)
+    {
+        HeaderTracker.Update(PropertyDecimalPlaces, value);
+    }
+
     partial void OnSelectedCoordinateSystemChanged(CoordinateSystemOption? value)
     {
         HeaderTracker.Update(PropertyCoordinateSystem, value?.Key ?? Settings.CoordinateSystems.Default);
@@ -405,6 +425,11 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         LoadStringProperty(settings, s => s.X, CodeGenerationDefaults.Coordinate, PropertyX, v => X = v);
         LoadStringProperty(settings, s => s.Y, CodeGenerationDefaults.Coordinate, PropertyY, v => Y = v);
         LoadStringProperty(settings, s => s.Z, CodeGenerationDefaults.Coordinate, PropertyZ, v => Z = v);
+        
+        // Load DecimalPlaces as int, convert to string for UI
+        var decimalPlaces = settings.DecimalPlaces ?? CodeGenerationDefaults.DecimalPlaces;
+        DecimalPlaces = decimalPlaces.ToString();
+        HeaderTracker.Update(PropertyDecimalPlaces, DecimalPlaces);
     }
 
     public override void SaveToSettings(AppSettings settings)
@@ -427,6 +452,16 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         settings.X = X;
         settings.Y = Y;
         settings.Z = Z;
+        
+        // Save DecimalPlaces as int, parse from string
+        if (int.TryParse(DecimalPlaces, out var decimalPlaces))
+        {
+            settings.DecimalPlaces = decimalPlaces;
+        }
+        else
+        {
+            settings.DecimalPlaces = CodeGenerationDefaults.DecimalPlaces;
+        }
     }
 
     public override void ResetToOriginal()
@@ -453,6 +488,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         ResetStringProperty(PropertyX, CodeGenerationDefaults.Coordinate, v => X = v);
         ResetStringProperty(PropertyY, CodeGenerationDefaults.Coordinate, v => Y = v);
         ResetStringProperty(PropertyZ, CodeGenerationDefaults.Coordinate, v => Z = v);
+        ResetStringProperty(PropertyDecimalPlaces, CodeGenerationDefaults.DecimalPlaces.ToString(), v => DecimalPlaces = v);
         
         UpdateCodeGenerationDependentControls();
         HeaderTracker.UpdateAllHeadersImmediate();
