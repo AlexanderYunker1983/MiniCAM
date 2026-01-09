@@ -10,7 +10,7 @@ namespace MiniCAM.Core.ViewModels;
 /// Main coordinator ViewModel for code generation settings window.
 /// Manages three tab ViewModels: CodeGenerationTabViewModel, SpindleSettingsViewModel, and CoolantSettingsViewModel.
 /// </summary>
-public partial class CodeGenerationSettingsViewModel : ViewModelBase, IDisposable
+public partial class CodeGenerationSettingsViewModel : LocalizedViewModelBase
 {
     public CodeGenerationTabViewModel CodeGenerationTab { get; }
     public SpindleSettingsViewModel SpindleSettings { get; }
@@ -27,17 +27,9 @@ public partial class CodeGenerationSettingsViewModel : ViewModelBase, IDisposabl
         CodeGenerationTab = new CodeGenerationTabViewModel();
         SpindleSettings = new SpindleSettingsViewModel();
         CoolantSettings = new CoolantSettingsViewModel();
-        
-        Resources.CultureChanged += OnCultureChanged;
-        UpdateLocalizedStrings();
     }
 
-    private void OnCultureChanged(object? sender, CultureChangedEventArgs e)
-    {
-        UpdateLocalizedStrings();
-    }
-
-    private void UpdateLocalizedStrings()
+    protected override void UpdateLocalizedStrings()
     {
         ApplyButtonText = Resources.ButtonApply;
         ResetButtonText = Resources.ButtonReset;
@@ -75,9 +67,9 @@ public partial class CodeGenerationSettingsViewModel : ViewModelBase, IDisposabl
         CoolantSettings.ResetToOriginal();
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
-        Resources.CultureChanged -= OnCultureChanged;
+        base.Dispose();
         CodeGenerationTab?.Dispose();
         SpindleSettings?.Dispose();
         CoolantSettings?.Dispose();
@@ -85,24 +77,49 @@ public partial class CodeGenerationSettingsViewModel : ViewModelBase, IDisposabl
 }
 
 // Option classes used by tab ViewModels
+
+/// <summary>
+/// Represents a spindle enable command option (M3, M4).
+/// </summary>
 public partial class SpindleEnableCommandOption : OptionBase
 {
+    /// <summary>
+    /// Initializes a new instance of the SpindleEnableCommandOption class.
+    /// </summary>
+    /// <param name="key">The command key (e.g., "M3", "M4").</param>
+    /// <param name="displayName">The localized display name.</param>
     public SpindleEnableCommandOption(string key, string displayName)
         : base(key, displayName)
     {
     }
 }
 
+/// <summary>
+/// Represents a spindle delay parameter option (F, P, Pxx.).
+/// </summary>
 public partial class SpindleDelayParameterOption : OptionBase
 {
+    /// <summary>
+    /// Initializes a new instance of the SpindleDelayParameterOption class.
+    /// </summary>
+    /// <param name="key">The parameter key (e.g., "F", "P", "Pxx.").</param>
+    /// <param name="displayName">The localized display name.</param>
     public SpindleDelayParameterOption(string key, string displayName)
         : base(key, displayName)
     {
     }
 }
 
+/// <summary>
+/// Represents a work coordinate system option (G54-G59).
+/// </summary>
 public partial class CoordinateSystemOption : OptionBase
 {
+    /// <summary>
+    /// Initializes a new instance of the CoordinateSystemOption class.
+    /// </summary>
+    /// <param name="key">The coordinate system key (e.g., "G54", "G55").</param>
+    /// <param name="displayName">The localized display name.</param>
     public CoordinateSystemOption(string key, string displayName)
         : base(key, displayName)
     {

@@ -25,7 +25,7 @@ public abstract class SettingsTabViewModelBase : ViewModelBase, IDisposable
     protected virtual void OnCultureChanged(object? sender, CultureChangedEventArgs e)
     {
         UpdateLocalizedStrings();
-        HeaderTracker.UpdateAllHeaders();
+        HeaderTracker.UpdateAllHeadersImmediate();
     }
 
     protected abstract void UpdateLocalizedStrings();

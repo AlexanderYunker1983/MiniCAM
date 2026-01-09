@@ -8,6 +8,10 @@ using MiniCAM.Core.Settings;
 
 namespace MiniCAM.Core.ViewModels;
 
+/// <summary>
+/// View model for the Spindle settings tab.
+/// Manages spindle control options such as speed, enable commands, and delay parameters.
+/// </summary>
 public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
 {
     // Property name constants for tracking
@@ -64,6 +68,8 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
     // Collections for ComboBoxes
     public ObservableCollection<SpindleEnableCommandOption> SpindleEnableCommands { get; } = new();
     public ObservableCollection<SpindleDelayParameterOption> SpindleDelayParameters { get; } = new();
+    private readonly OptionCollectionHelper<SpindleEnableCommandOption> _spindleEnableCommandsHelper;
+    private readonly OptionCollectionHelper<SpindleDelayParameterOption> _spindleDelayParametersHelper;
 
     // Header text and font style properties
     [ObservableProperty]
@@ -122,12 +128,14 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
 
     public SpindleSettingsViewModel()
     {
+        _spindleEnableCommandsHelper = new OptionCollectionHelper<SpindleEnableCommandOption>(SpindleEnableCommands);
+        _spindleDelayParametersHelper = new OptionCollectionHelper<SpindleDelayParameterOption>(SpindleDelayParameters);
         BuildSpindleEnableCommands();
         BuildSpindleDelayParameters();
         LoadFromSettings(SettingsManager.Current);
         RegisterTrackedProperties();
         UpdateSpindleSubOptionsEnabled();
-        HeaderTracker.UpdateAllHeaders();
+        HeaderTracker.UpdateAllHeadersImmediate();
     }
 
     private void RegisterTrackedProperties()
@@ -205,44 +213,29 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
 
     private void BuildSpindleEnableCommands()
     {
-        SpindleEnableCommands.Clear();
-        SpindleEnableCommands.Add(new SpindleEnableCommandOption(SpindleCommands.M3, Resources.SpindleEnableCommandM3));
-        SpindleEnableCommands.Add(new SpindleEnableCommandOption(SpindleCommands.M4, Resources.SpindleEnableCommandM4));
+        _spindleEnableCommandsHelper.Clear();
+        _spindleEnableCommandsHelper
+            .Add(SpindleCommands.M3, () => Resources.SpindleEnableCommandM3, (k, d) => new SpindleEnableCommandOption(k, d))
+            .Add(SpindleCommands.M4, () => Resources.SpindleEnableCommandM4, (k, d) => new SpindleEnableCommandOption(k, d));
     }
 
     private void BuildSpindleDelayParameters()
     {
-        SpindleDelayParameters.Clear();
-        SpindleDelayParameters.Add(new SpindleDelayParameterOption(Settings.SpindleDelayParameters.F, Resources.SpindleDelayParameterF));
-        SpindleDelayParameters.Add(new SpindleDelayParameterOption(Settings.SpindleDelayParameters.P, Resources.SpindleDelayParameterP));
-        SpindleDelayParameters.Add(new SpindleDelayParameterOption(Settings.SpindleDelayParameters.Pxx, Resources.SpindleDelayParameterPxx));
+        _spindleDelayParametersHelper.Clear();
+        _spindleDelayParametersHelper
+            .Add(Settings.SpindleDelayParameters.F, () => Resources.SpindleDelayParameterF, (k, d) => new SpindleDelayParameterOption(k, d))
+            .Add(Settings.SpindleDelayParameters.P, () => Resources.SpindleDelayParameterP, (k, d) => new SpindleDelayParameterOption(k, d))
+            .Add(Settings.SpindleDelayParameters.Pxx, () => Resources.SpindleDelayParameterPxx, (k, d) => new SpindleDelayParameterOption(k, d));
     }
 
     private void UpdateSpindleEnableCommandDisplayNames()
     {
-        foreach (var command in SpindleEnableCommands)
-        {
-            command.DisplayName = command.Key switch
-            {
-                SpindleCommands.M3 => Resources.SpindleEnableCommandM3,
-                SpindleCommands.M4 => Resources.SpindleEnableCommandM4,
-                _ => command.Key
-            };
-        }
+        _spindleEnableCommandsHelper.UpdateDisplayNames();
     }
 
     private void UpdateSpindleDelayParameterDisplayNames()
     {
-        foreach (var parameter in SpindleDelayParameters)
-        {
-            parameter.DisplayName = parameter.Key switch
-            {
-                Settings.SpindleDelayParameters.F => Resources.SpindleDelayParameterF,
-                Settings.SpindleDelayParameters.P => Resources.SpindleDelayParameterP,
-                Settings.SpindleDelayParameters.Pxx => Resources.SpindleDelayParameterPxx,
-                _ => parameter.Key
-            };
-        }
+        _spindleDelayParametersHelper.UpdateDisplayNames();
     }
 
     partial void OnAddSpindleCodeChanged(bool value)
@@ -312,25 +305,25 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
 
     public override void LoadFromSettings(AppSettings settings)
     {
-        var addSpindleCode = settings.AddSpindleCode ?? SpindleDefaults.AddSpindleCode;
-        var setSpindleSpeed = settings.SetSpindleSpeed ?? SpindleDefaults.SetSpindleSpeed;
-        var spindleSpeed = settings.SpindleSpeed ?? SpindleDefaults.Speed;
-        var enableSpindleBeforeOperations = settings.EnableSpindleBeforeOperations ?? SpindleDefaults.EnableSpindleBeforeOperations;
-        var spindleEnableCommand = settings.SpindleEnableCommand ?? SpindleCommands.DefaultEnableCommand;
-        var addSpindleDelayAfterEnable = settings.AddSpindleDelayAfterEnable ?? SpindleDefaults.AddSpindleDelayAfterEnable;
-        var spindleDelayParameter = settings.SpindleDelayParameter ?? Settings.SpindleDelayParameters.Default;
-        var spindleDelayValue = settings.SpindleDelayValue ?? SpindleDefaults.DelayValue;
-        var disableSpindleAfterOperations = settings.DisableSpindleAfterOperations ?? SpindleDefaults.DisableSpindleAfterOperations;
+        var addSpindleCode = settings.GetValueOrDefault(s => s.AddSpindleCode, SpindleDefaults.AddSpindleCode);
+        var setSpindleSpeed = settings.GetValueOrDefault(s => s.SetSpindleSpeed, SpindleDefaults.SetSpindleSpeed);
+        var spindleSpeed = settings.GetStringOrDefault(s => s.SpindleSpeed, SpindleDefaults.Speed);
+        var enableSpindleBeforeOperations = settings.GetValueOrDefault(s => s.EnableSpindleBeforeOperations, SpindleDefaults.EnableSpindleBeforeOperations);
+        var spindleEnableCommand = settings.GetStringOrDefault(s => s.SpindleEnableCommand, SpindleCommands.DefaultEnableCommand);
+        var addSpindleDelayAfterEnable = settings.GetValueOrDefault(s => s.AddSpindleDelayAfterEnable, SpindleDefaults.AddSpindleDelayAfterEnable);
+        var spindleDelayParameter = settings.GetStringOrDefault(s => s.SpindleDelayParameter, Settings.SpindleDelayParameters.Default);
+        var spindleDelayValue = settings.GetStringOrDefault(s => s.SpindleDelayValue, SpindleDefaults.DelayValue);
+        var disableSpindleAfterOperations = settings.GetValueOrDefault(s => s.DisableSpindleAfterOperations, SpindleDefaults.DisableSpindleAfterOperations);
 
         AddSpindleCode = addSpindleCode;
         SetSpindleSpeed = setSpindleSpeed;
         SpindleSpeed = spindleSpeed;
         EnableSpindleBeforeOperations = enableSpindleBeforeOperations;
-        SelectedSpindleEnableCommand = SpindleEnableCommands.FirstOrDefault(x => x.Key == spindleEnableCommand)
-                                      ?? SpindleEnableCommands.FirstOrDefault(x => x.Key == SpindleCommands.DefaultEnableCommand);
+        SelectedSpindleEnableCommand = _spindleEnableCommandsHelper.FindByKey(spindleEnableCommand)
+                                      ?? _spindleEnableCommandsHelper.FindByKey(SpindleCommands.DefaultEnableCommand);
         AddSpindleDelayAfterEnable = addSpindleDelayAfterEnable;
-        SelectedSpindleDelayParameter = SpindleDelayParameters.FirstOrDefault(x => x.Key == spindleDelayParameter)
-                                       ?? SpindleDelayParameters.FirstOrDefault(x => x.Key == Settings.SpindleDelayParameters.Default);
+        SelectedSpindleDelayParameter = _spindleDelayParametersHelper.FindByKey(spindleDelayParameter)
+                                       ?? _spindleDelayParametersHelper.FindByKey(Settings.SpindleDelayParameters.Default);
         SpindleDelayValue = spindleDelayValue;
         DisableSpindleAfterOperations = disableSpindleAfterOperations;
 
@@ -366,15 +359,15 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
         SpindleSpeed = HeaderTracker.GetOriginalValue<string>(PropertySpindleSpeed) ?? SpindleDefaults.Speed;
         EnableSpindleBeforeOperations = HeaderTracker.GetOriginalValue<bool>(PropertyEnableSpindleBeforeOperations);
         var originalCommand = HeaderTracker.GetOriginalValue<string>(PropertySpindleEnableCommand) ?? SpindleCommands.DefaultEnableCommand;
-        SelectedSpindleEnableCommand = SpindleEnableCommands.FirstOrDefault(x => x.Key == originalCommand)
-                                      ?? SpindleEnableCommands.FirstOrDefault(x => x.Key == SpindleCommands.DefaultEnableCommand);
+        SelectedSpindleEnableCommand = _spindleEnableCommandsHelper.FindByKey(originalCommand)
+                                      ?? _spindleEnableCommandsHelper.FindByKey(SpindleCommands.DefaultEnableCommand);
         AddSpindleDelayAfterEnable = HeaderTracker.GetOriginalValue<bool>(PropertyAddSpindleDelayAfterEnable);
         var originalParameter = HeaderTracker.GetOriginalValue<string>(PropertySpindleDelayParameter) ?? Settings.SpindleDelayParameters.Default;
-        SelectedSpindleDelayParameter = SpindleDelayParameters.FirstOrDefault(x => x.Key == originalParameter)
-                                       ?? SpindleDelayParameters.FirstOrDefault(x => x.Key == Settings.SpindleDelayParameters.Default);
+        SelectedSpindleDelayParameter = _spindleDelayParametersHelper.FindByKey(originalParameter)
+                                       ?? _spindleDelayParametersHelper.FindByKey(Settings.SpindleDelayParameters.Default);
         SpindleDelayValue = HeaderTracker.GetOriginalValue<string>(PropertySpindleDelayValue) ?? SpindleDefaults.DelayValue;
         DisableSpindleAfterOperations = HeaderTracker.GetOriginalValue<bool>(PropertyDisableSpindleAfterOperations);
         UpdateSpindleSubOptionsEnabled();
-        HeaderTracker.UpdateAllHeaders();
+        HeaderTracker.UpdateAllHeadersImmediate();
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -10,14 +10,14 @@ using MiniCAM.Core.Views;
 
 namespace MiniCAM.Core.ViewModels;
 
-public partial class MainViewModel : ViewModelBase
+/// <summary>
+/// Main view model for the application window.
+/// Manages operations list, ribbon tabs, and application settings dialogs.
+/// </summary>
+public partial class MainViewModel : LocalizedViewModelBase
 {
     public MainViewModel()
     {
-        // Subscribe to culture changes to update localized strings
-        Resources.CultureChanged += OnCultureChanged;
-        UpdateLocalizedStrings();
-        
         // Subscribe to collection changes to update command availability
         Operations.CollectionChanged += (s, e) => UpdateCommandAvailability();
         
@@ -27,12 +27,7 @@ public partial class MainViewModel : ViewModelBase
         Operations.Add(new OperationItem("Pocket Operation 1"));
     }
 
-    private void OnCultureChanged(object? sender, CultureChangedEventArgs e)
-    {
-        UpdateLocalizedStrings();
-    }
-
-    private void UpdateLocalizedStrings()
+    protected override void UpdateLocalizedStrings()
     {
         MenuSettingsText = Resources.MenuSettings;
         MenuApplicationSettingsText = Resources.MenuApplicationSettings;
@@ -106,9 +101,9 @@ public partial class MainViewModel : ViewModelBase
             DataContext = new ApplicationSettingsViewModel()
         };
 
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
         {
-            settingsWindow.Icon = desktop.MainWindow?.Icon;
+            settingsWindow.Icon = desktop.MainWindow.Icon;
             settingsWindow.ShowDialog(desktop.MainWindow);
         }
     }
@@ -118,9 +113,9 @@ public partial class MainViewModel : ViewModelBase
     {
         var settingsWindow = new CodeGenerationSettingsWindow();
 
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
         {
-            settingsWindow.Icon = desktop.MainWindow?.Icon;
+            settingsWindow.Icon = desktop.MainWindow.Icon;
             settingsWindow.ShowDialog(desktop.MainWindow);
         }
     }
@@ -193,14 +188,27 @@ public partial class MainViewModel : ViewModelBase
     }
 }
 
+/// <summary>
+/// Represents a single operation item in the operations list.
+/// </summary>
 public partial class OperationItem : ObservableObject
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether the operation is enabled.
+    /// </summary>
     [ObservableProperty]
     private bool _isEnabled = true;
 
+    /// <summary>
+    /// Gets or sets the operation name.
+    /// </summary>
     [ObservableProperty]
     private string _name;
 
+    /// <summary>
+    /// Initializes a new instance of the OperationItem class.
+    /// </summary>
+    /// <param name="name">The operation name.</param>
     public OperationItem(string name)
     {
         _name = name;

@@ -1,16 +1,40 @@
 using System;
 using System.Collections.Generic;
 using Avalonia.Media;
+using Avalonia.Threading;
 using MiniCAM.Core.Localization;
 
 namespace MiniCAM.Core.ViewModels;
 
 /// <summary>
 /// Tracks property changes and manages header text and font style for each property.
+/// Uses debouncing to optimize UI updates when multiple properties change rapidly.
 /// </summary>
 public class HeaderPropertyTracker
 {
     private readonly Dictionary<string, PropertyHeaderInfo> _properties = new();
+    private readonly DispatcherTimer _updateTimer;
+    private bool _needsUpdate;
+
+    /// <summary>
+    /// Initializes a new instance of the HeaderPropertyTracker class.
+    /// </summary>
+    public HeaderPropertyTracker()
+    {
+        _updateTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(100)
+        };
+        _updateTimer.Tick += (s, e) =>
+        {
+            _updateTimer.Stop();
+            if (_needsUpdate)
+            {
+                _needsUpdate = false;
+                UpdateAllHeadersImmediate();
+            }
+        };
+    }
 
     /// <summary>
     /// Registers a property for tracking with its header information.
@@ -57,14 +81,36 @@ public class HeaderPropertyTracker
     }
 
     /// <summary>
-    /// Updates all header indicators.
+    /// Updates all header indicators with debouncing to optimize performance.
+    /// Use this method for regular updates that can be batched.
     /// </summary>
     public void UpdateAllHeaders()
     {
+        ScheduleHeaderUpdate();
+    }
+
+    /// <summary>
+    /// Immediately updates all header indicators without debouncing.
+    /// Use this method when immediate update is required (e.g., after loading settings).
+    /// </summary>
+    public void UpdateAllHeadersImmediate()
+    {
+        _updateTimer.Stop();
+        _needsUpdate = false;
         foreach (var propertyName in _properties.Keys)
         {
             UpdateHeader(propertyName);
         }
+    }
+
+    /// <summary>
+    /// Schedules a header update with debouncing to prevent excessive UI updates.
+    /// </summary>
+    private void ScheduleHeaderUpdate()
+    {
+        _needsUpdate = true;
+        _updateTimer.Stop();
+        _updateTimer.Start();
     }
 
     /// <summary>
@@ -153,10 +199,12 @@ public class HeaderPropertyTracker
     }
 
     /// <summary>
-    /// Clears all tracked properties.
+    /// Clears all tracked properties and stops any pending updates.
     /// </summary>
     public void Clear()
     {
+        _updateTimer.Stop();
+        _needsUpdate = false;
         _properties.Clear();
     }
 }

@@ -6,6 +6,10 @@ using MiniCAM.Core.Settings;
 
 namespace MiniCAM.Core.ViewModels;
 
+/// <summary>
+/// View model for the Coolant settings tab.
+/// Manages coolant control options such as enable/disable at start/end.
+/// </summary>
 public partial class CoolantSettingsViewModel : SettingsTabViewModelBase
 {
     [ObservableProperty]
@@ -48,7 +52,7 @@ public partial class CoolantSettingsViewModel : SettingsTabViewModelBase
         LoadFromSettings(SettingsManager.Current);
         RegisterTrackedProperties();
         UpdateCoolantSubOptionsEnabled();
-        HeaderTracker.UpdateAllHeaders();
+        HeaderTracker.UpdateAllHeadersImmediate();
     }
 
     private void RegisterTrackedProperties()
@@ -103,9 +107,9 @@ public partial class CoolantSettingsViewModel : SettingsTabViewModelBase
 
     public override void LoadFromSettings(AppSettings settings)
     {
-        var addCoolantCode = settings.AddCoolantCode ?? CoolantDefaults.AddCoolantCode;
-        var enableCoolantAtStart = settings.EnableCoolantAtStart ?? CoolantDefaults.EnableCoolantAtStart;
-        var disableCoolantAtEnd = settings.DisableCoolantAtEnd ?? CoolantDefaults.DisableCoolantAtEnd;
+        var addCoolantCode = settings.GetValueOrDefault(s => s.AddCoolantCode, CoolantDefaults.AddCoolantCode);
+        var enableCoolantAtStart = settings.GetValueOrDefault(s => s.EnableCoolantAtStart, CoolantDefaults.EnableCoolantAtStart);
+        var disableCoolantAtEnd = settings.GetValueOrDefault(s => s.DisableCoolantAtEnd, CoolantDefaults.DisableCoolantAtEnd);
 
         AddCoolantCode = addCoolantCode;
         EnableCoolantAtStart = enableCoolantAtStart;
@@ -130,6 +134,6 @@ public partial class CoolantSettingsViewModel : SettingsTabViewModelBase
         EnableCoolantAtStart = HeaderTracker.GetOriginalValue<bool>(PropertyEnableCoolantAtStart);
         DisableCoolantAtEnd = HeaderTracker.GetOriginalValue<bool>(PropertyDisableCoolantAtEnd);
         UpdateCoolantSubOptionsEnabled();
-        HeaderTracker.UpdateAllHeaders();
+        HeaderTracker.UpdateAllHeadersImmediate();
     }
 }

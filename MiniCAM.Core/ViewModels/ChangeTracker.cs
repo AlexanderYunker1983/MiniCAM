@@ -8,8 +8,8 @@ namespace MiniCAM.Core.ViewModels;
 /// </summary>
 public class ChangeTracker<T>
 {
-    private T _originalValue;
-    private T _currentValue;
+    private T _originalValue = default!;
+    private T _currentValue = default!;
 
     /// <summary>
     /// Gets or sets the original value (baseline for comparison).

@@ -8,6 +8,10 @@ using MiniCAM.Core.Settings;
 
 namespace MiniCAM.Core.ViewModels;
 
+/// <summary>
+/// View model for the Code Generation settings tab.
+/// Manages code generation options such as line numbers, coordinate systems, and movement settings.
+/// </summary>
 public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
 {
     // Property name constants for tracking
@@ -100,6 +104,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
 
     // Collections for ComboBoxes
     public ObservableCollection<CoordinateSystemOption> CoordinateSystems { get; } = new();
+    private readonly OptionCollectionHelper<CoordinateSystemOption> _coordinateSystemsHelper;
 
     // Header text and font style properties
     [ObservableProperty]
@@ -212,11 +217,12 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
 
     public CodeGenerationTabViewModel()
     {
+        _coordinateSystemsHelper = new OptionCollectionHelper<CoordinateSystemOption>(CoordinateSystems);
         BuildCoordinateSystems();
         LoadFromSettings(SettingsManager.Current);
         RegisterTrackedProperties();
         UpdateCodeGenSubOptionsEnabled();
-        HeaderTracker.UpdateAllHeaders();
+        HeaderTracker.UpdateAllHeadersImmediate();
     }
 
     private void RegisterTrackedProperties()
@@ -356,30 +362,19 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
 
     private void BuildCoordinateSystems()
     {
-        CoordinateSystems.Clear();
-        CoordinateSystems.Add(new CoordinateSystemOption(Settings.CoordinateSystems.G54, Resources.CodeGenCoordinateSystemG54));
-        CoordinateSystems.Add(new CoordinateSystemOption(Settings.CoordinateSystems.G55, Resources.CodeGenCoordinateSystemG55));
-        CoordinateSystems.Add(new CoordinateSystemOption(Settings.CoordinateSystems.G56, Resources.CodeGenCoordinateSystemG56));
-        CoordinateSystems.Add(new CoordinateSystemOption(Settings.CoordinateSystems.G57, Resources.CodeGenCoordinateSystemG57));
-        CoordinateSystems.Add(new CoordinateSystemOption(Settings.CoordinateSystems.G58, Resources.CodeGenCoordinateSystemG58));
-        CoordinateSystems.Add(new CoordinateSystemOption(Settings.CoordinateSystems.G59, Resources.CodeGenCoordinateSystemG59));
+        _coordinateSystemsHelper.Clear();
+        _coordinateSystemsHelper
+            .Add(Settings.CoordinateSystems.G54, () => Resources.CodeGenCoordinateSystemG54, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Settings.CoordinateSystems.G55, () => Resources.CodeGenCoordinateSystemG55, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Settings.CoordinateSystems.G56, () => Resources.CodeGenCoordinateSystemG56, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Settings.CoordinateSystems.G57, () => Resources.CodeGenCoordinateSystemG57, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Settings.CoordinateSystems.G58, () => Resources.CodeGenCoordinateSystemG58, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Settings.CoordinateSystems.G59, () => Resources.CodeGenCoordinateSystemG59, (k, d) => new CoordinateSystemOption(k, d));
     }
 
     private void UpdateCoordinateSystemDisplayNames()
     {
-        foreach (var system in CoordinateSystems)
-        {
-            system.DisplayName = system.Key switch
-            {
-                Settings.CoordinateSystems.G54 => Resources.CodeGenCoordinateSystemG54,
-                Settings.CoordinateSystems.G55 => Resources.CodeGenCoordinateSystemG55,
-                Settings.CoordinateSystems.G56 => Resources.CodeGenCoordinateSystemG56,
-                Settings.CoordinateSystems.G57 => Resources.CodeGenCoordinateSystemG57,
-                Settings.CoordinateSystems.G58 => Resources.CodeGenCoordinateSystemG58,
-                Settings.CoordinateSystems.G59 => Resources.CodeGenCoordinateSystemG59,
-                _ => system.Key
-            };
-        }
+        _coordinateSystemsHelper.UpdateDisplayNames();
     }
 
     partial void OnUseLineNumbersChanged(bool value)
@@ -487,24 +482,24 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
 
     public override void LoadFromSettings(AppSettings settings)
     {
-        var useLineNumbers = settings.UseLineNumbers ?? CodeGenerationDefaults.UseLineNumbers;
-        var startLineNumber = settings.StartLineNumber ?? CodeGenerationDefaults.StartLineNumber;
-        var lineNumberStep = settings.LineNumberStep ?? CodeGenerationDefaults.LineNumberStep;
-        var generateComments = settings.GenerateComments ?? CodeGenerationDefaults.GenerateComments;
-        var allowArcs = settings.AllowArcs ?? CodeGenerationDefaults.AllowArcs;
-        var formatCommands = settings.FormatCommands ?? CodeGenerationDefaults.FormatCommands;
-        var setWorkCoordinateSystem = settings.SetWorkCoordinateSystem ?? CodeGenerationDefaults.SetWorkCoordinateSystem;
-        var coordinateSystem = settings.CoordinateSystem ?? Settings.CoordinateSystems.Default;
-        var setAbsoluteCoordinates = settings.SetAbsoluteCoordinates ?? CodeGenerationDefaults.SetAbsoluteCoordinates;
-        var allowRelativeCoordinates = settings.AllowRelativeCoordinates ?? CodeGenerationDefaults.AllowRelativeCoordinates;
-        var setZerosAtStart = settings.SetZerosAtStart ?? CodeGenerationDefaults.SetZerosAtStart;
-        var x0 = settings.X0 ?? CodeGenerationDefaults.Coordinate;
-        var y0 = settings.Y0 ?? CodeGenerationDefaults.Coordinate;
-        var z0 = settings.Z0 ?? CodeGenerationDefaults.Coordinate;
-        var moveToPointAtEnd = settings.MoveToPointAtEnd ?? CodeGenerationDefaults.MoveToPointAtEnd;
-        var x = settings.X ?? CodeGenerationDefaults.Coordinate;
-        var y = settings.Y ?? CodeGenerationDefaults.Coordinate;
-        var z = settings.Z ?? CodeGenerationDefaults.Coordinate;
+        var useLineNumbers = settings.GetValueOrDefault(s => s.UseLineNumbers, CodeGenerationDefaults.UseLineNumbers);
+        var startLineNumber = settings.GetStringOrDefault(s => s.StartLineNumber, CodeGenerationDefaults.StartLineNumber);
+        var lineNumberStep = settings.GetStringOrDefault(s => s.LineNumberStep, CodeGenerationDefaults.LineNumberStep);
+        var generateComments = settings.GetValueOrDefault(s => s.GenerateComments, CodeGenerationDefaults.GenerateComments);
+        var allowArcs = settings.GetValueOrDefault(s => s.AllowArcs, CodeGenerationDefaults.AllowArcs);
+        var formatCommands = settings.GetValueOrDefault(s => s.FormatCommands, CodeGenerationDefaults.FormatCommands);
+        var setWorkCoordinateSystem = settings.GetValueOrDefault(s => s.SetWorkCoordinateSystem, CodeGenerationDefaults.SetWorkCoordinateSystem);
+        var coordinateSystem = settings.GetStringOrDefault(s => s.CoordinateSystem, Settings.CoordinateSystems.Default);
+        var setAbsoluteCoordinates = settings.GetValueOrDefault(s => s.SetAbsoluteCoordinates, CodeGenerationDefaults.SetAbsoluteCoordinates);
+        var allowRelativeCoordinates = settings.GetValueOrDefault(s => s.AllowRelativeCoordinates, CodeGenerationDefaults.AllowRelativeCoordinates);
+        var setZerosAtStart = settings.GetValueOrDefault(s => s.SetZerosAtStart, CodeGenerationDefaults.SetZerosAtStart);
+        var x0 = settings.GetStringOrDefault(s => s.X0, CodeGenerationDefaults.Coordinate);
+        var y0 = settings.GetStringOrDefault(s => s.Y0, CodeGenerationDefaults.Coordinate);
+        var z0 = settings.GetStringOrDefault(s => s.Z0, CodeGenerationDefaults.Coordinate);
+        var moveToPointAtEnd = settings.GetValueOrDefault(s => s.MoveToPointAtEnd, CodeGenerationDefaults.MoveToPointAtEnd);
+        var x = settings.GetStringOrDefault(s => s.X, CodeGenerationDefaults.Coordinate);
+        var y = settings.GetStringOrDefault(s => s.Y, CodeGenerationDefaults.Coordinate);
+        var z = settings.GetStringOrDefault(s => s.Z, CodeGenerationDefaults.Coordinate);
 
         UseLineNumbers = useLineNumbers;
         StartLineNumber = startLineNumber;
@@ -513,8 +508,8 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         AllowArcs = allowArcs;
         FormatCommands = formatCommands;
         SetWorkCoordinateSystem = setWorkCoordinateSystem;
-        SelectedCoordinateSystem = CoordinateSystems.FirstOrDefault(x => x.Key == coordinateSystem)
-                                   ?? CoordinateSystems.FirstOrDefault(x => x.Key == Settings.CoordinateSystems.Default);
+        SelectedCoordinateSystem = _coordinateSystemsHelper.FindByKey(coordinateSystem)
+                                   ?? _coordinateSystemsHelper.FindByKey(Settings.CoordinateSystems.Default);
         SetAbsoluteCoordinates = setAbsoluteCoordinates;
         AllowRelativeCoordinates = allowRelativeCoordinates;
         SetZerosAtStart = setZerosAtStart;
@@ -579,8 +574,8 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         FormatCommands = HeaderTracker.GetOriginalValue<bool>(PropertyFormatCommands);
         SetWorkCoordinateSystem = HeaderTracker.GetOriginalValue<bool>(PropertySetWorkCoordinateSystem);
         var originalCoordinateSystem = HeaderTracker.GetOriginalValue<string>(PropertyCoordinateSystem) ?? Settings.CoordinateSystems.Default;
-        SelectedCoordinateSystem = CoordinateSystems.FirstOrDefault(x => x.Key == originalCoordinateSystem)
-                                   ?? CoordinateSystems.FirstOrDefault(x => x.Key == Settings.CoordinateSystems.Default);
+        SelectedCoordinateSystem = _coordinateSystemsHelper.FindByKey(originalCoordinateSystem)
+                                   ?? _coordinateSystemsHelper.FindByKey(Settings.CoordinateSystems.Default);
         SetAbsoluteCoordinates = HeaderTracker.GetOriginalValue<bool>(PropertySetAbsoluteCoordinates);
         AllowRelativeCoordinates = HeaderTracker.GetOriginalValue<bool>(PropertyAllowRelativeCoordinates);
         SetZerosAtStart = HeaderTracker.GetOriginalValue<bool>(PropertySetZerosAtStart);
@@ -592,6 +587,6 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         Y = HeaderTracker.GetOriginalValue<string>(PropertyY) ?? CodeGenerationDefaults.Coordinate;
         Z = HeaderTracker.GetOriginalValue<string>(PropertyZ) ?? CodeGenerationDefaults.Coordinate;
         UpdateCodeGenSubOptionsEnabled();
-        HeaderTracker.UpdateAllHeaders();
+        HeaderTracker.UpdateAllHeadersImmediate();
     }
 }
