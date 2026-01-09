@@ -258,31 +258,24 @@ public partial class ApplicationSettingsViewModel : ViewModelBase, IDisposable
     }
 }
 
-public partial class LanguageOption : ObservableObject
+public partial class LanguageOption : OptionBase
 {
-    public string CultureName { get; }
-
-    [ObservableProperty]
-    private string _displayName;
+    /// <summary>
+    /// Gets the culture name (alias for Key for backward compatibility).
+    /// </summary>
+    public string CultureName => Key;
 
     public LanguageOption(string cultureName, string displayName)
+        : base(cultureName, displayName)
     {
-        CultureName = cultureName;
-        _displayName = displayName;
     }
 }
 
-public partial class ThemeOption : ObservableObject
+public partial class ThemeOption : OptionBase
 {
-    public string Key { get; }
-
-    [ObservableProperty]
-    private string _displayName;
-
     public ThemeOption(string key, string displayName)
+        : base(key, displayName)
     {
-        Key = key;
-        _displayName = displayName;
     }
 }
 

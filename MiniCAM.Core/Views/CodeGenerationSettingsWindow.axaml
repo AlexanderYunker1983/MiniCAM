@@ -38,7 +38,8 @@
             <TextBlock x:Name="TabCodeGenerationText"
                        FontSize="{StaticResource RibbonTabHeaderFontSize}" />
           </TabItem.Header>
-          <Border Classes="RibbonTabContent">
+          <Border Classes="RibbonTabContent"
+                  DataContext="{Binding CodeGenerationTab}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
               <StackPanel Spacing="12" Margin="8">
                 <!-- Use line numbers -->
@@ -202,7 +203,8 @@
             <TextBlock x:Name="TabSpindleText"
                        FontSize="{StaticResource RibbonTabHeaderFontSize}" />
           </TabItem.Header>
-          <Border Classes="RibbonTabContent">
+          <Border Classes="RibbonTabContent"
+                  DataContext="{Binding SpindleSettings}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
               <StackPanel Spacing="12" Margin="8">
                 <!-- Main checkbox: Add spindle control code -->
@@ -300,7 +302,8 @@
             <TextBlock x:Name="TabCoolantText"
                        FontSize="{StaticResource RibbonTabHeaderFontSize}" />
           </TabItem.Header>
-          <Border Classes="RibbonTabContent">
+          <Border Classes="RibbonTabContent"
+                  DataContext="{Binding CoolantSettings}">
             <StackPanel Spacing="12" Margin="8">
               <CheckBox IsChecked="{Binding AddCoolantCode, Mode=TwoWay}">
                 <CheckBox.Content>
