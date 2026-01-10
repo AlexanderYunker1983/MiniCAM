@@ -178,6 +178,8 @@ public static class Resources
     public static string PrimitivePoint => GetString(nameof(PrimitivePoint), "Point");
     public static string ButtonGridSnap => GetString(nameof(ButtonGridSnap), "Grid Snap");
     public static string ButtonObjectSnap => GetString(nameof(ButtonObjectSnap), "Object Snap");
+    public static string CoordinateX => GetString(nameof(CoordinateX), "X");
+    public static string CoordinateY => GetString(nameof(CoordinateY), "Y");
     public static string GCodeProgram => GetString(nameof(GCodeProgram), "Program");
     public static string GCodeFileCreated => GetString(nameof(GCodeFileCreated), "File created:");
     public static string CodeGenDecimalPlaces => GetString(nameof(CodeGenDecimalPlaces), "Decimal places");

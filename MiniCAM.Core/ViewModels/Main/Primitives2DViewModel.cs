@@ -18,9 +18,22 @@ public partial class Primitives2DViewModel : LocalizedViewModelBase
     [ObservableProperty]
     private string _deleteButtonText = Resources.ButtonDelete;
 
+    [ObservableProperty]
+    private bool _isSelectionEnabled = true;
+
     protected override void UpdateLocalizedStrings()
     {
         DeleteButtonText = Resources.ButtonDelete;
+        
+        // Update primitive names when language changes
+        foreach (var primitive in Primitives)
+        {
+            if (primitive is Point2DPrimitive)
+            {
+                primitive.Name = Resources.PrimitivePoint;
+            }
+            // Add other primitive types here when they are implemented
+        }
     }
 
     public Primitives2DViewModel()
@@ -44,5 +57,14 @@ public partial class Primitives2DViewModel : LocalizedViewModelBase
     partial void OnSelectedPrimitiveChanged(Primitive2DItem? oldValue, Primitive2DItem? newValue)
     {
         DeletePrimitiveCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnIsSelectionEnabledChanged(bool value)
+    {
+        // Clear selection when selection is disabled
+        if (!value)
+        {
+            SelectedPrimitive = null;
+        }
     }
 }

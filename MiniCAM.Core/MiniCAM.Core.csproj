@@ -9,6 +9,14 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <!-- Remove auto-included axaml files to avoid duplicates -->
+    <AvaloniaXaml Remove="**\*.axaml" />
+    <!-- Explicitly include axaml files -->
+    <AvaloniaXaml Include="App.axaml" />
+    <AvaloniaXaml Include="Views\**\*.axaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Localization\Resources.resx">

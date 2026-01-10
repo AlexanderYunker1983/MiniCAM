@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MiniCAM.Core.ViewModels.Main"
+             x:Class="MiniCAM.Core.Views.PointPropertiesView"
+             x:DataType="vm:PointPropertiesViewModel"
+             mc:Ignorable="d">
+  <StackPanel Spacing="12" Margin="8">
+    <!-- X Coordinate -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding XLabelText}" FontWeight="SemiBold" />
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
+        <TextBox Grid.Column="0"
+                 Text="{Binding X, StringFormat='{}{0:F3}', Mode=TwoWay}"
+                 HorizontalAlignment="Stretch" />
+        <ToggleButton Grid.Column="1"
+                      IsChecked="{Binding IsXLocked, Mode=TwoWay}"
+                      Width="32"
+                      Height="32"
+                      ToolTip.Tip="Lock X coordinate">
+          <TextBlock Text="🔒" FontSize="14" />
+        </ToggleButton>
+      </Grid>
+    </StackPanel>
+
+    <!-- Y Coordinate -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding YLabelText}" FontWeight="SemiBold" />
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
+        <TextBox Grid.Column="0"
+                 Text="{Binding Y, StringFormat='{}{0:F3}', Mode=TwoWay}"
+                 HorizontalAlignment="Stretch" />
+        <ToggleButton Grid.Column="1"
+                      IsChecked="{Binding IsYLocked, Mode=TwoWay}"
+                      Width="32"
+                      Height="32"
+                      ToolTip.Tip="Lock Y coordinate">
+          <TextBlock Text="🔒" FontSize="14" />
+        </ToggleButton>
+      </Grid>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

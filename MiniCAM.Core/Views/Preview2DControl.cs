@@ -24,6 +24,13 @@ public class Preview2DControl : Control
     private Point2DPrimitive? _snappedXPoint;
     private Point2DPrimitive? _snappedYPoint;
     private Point _snappedWorldPos;
+    
+    // Point under cursor for hover effect (when not in point mode)
+    private Point2DPrimitive? _hoveredPoint;
+    
+    // Point moving mode
+    private bool _isMovingPoint = false;
+    private Point2DPrimitive? _movingPoint;
 
     public static readonly StyledProperty<Preview2DViewModel?> ViewModelProperty =
         AvaloniaProperty.Register<Preview2DControl, Preview2DViewModel?>(nameof(ViewModel));
@@ -45,12 +52,24 @@ public class Preview2DControl : Control
                 oldCollection.CollectionChanged -= Primitives_CollectionChanged;
             }
             
+            // Unsubscribe from old Primitives2DViewModel property changes
+            if (_mainViewModel?.Primitives2DViewModel != null)
+            {
+                _mainViewModel.Primitives2DViewModel.PropertyChanged -= Primitives2DViewModel_PropertyChanged;
+            }
+            
             _mainViewModel = value;
             
             // Subscribe to new collection
             if (_mainViewModel?.Primitives2DViewModel?.Primitives is INotifyCollectionChanged newCollection)
             {
                 newCollection.CollectionChanged += Primitives_CollectionChanged;
+            }
+            
+            // Subscribe to Primitives2DViewModel property changes (e.g., SelectedPrimitive)
+            if (_mainViewModel?.Primitives2DViewModel != null)
+            {
+                _mainViewModel.Primitives2DViewModel.PropertyChanged += Primitives2DViewModel_PropertyChanged;
             }
             
             InvalidateVisual();
@@ -62,12 +81,21 @@ public class Preview2DControl : Control
         _snappedXPoint = snappedXPoint;
         _snappedYPoint = snappedYPoint;
         _snappedWorldPos = snappedWorldPos;
-        InvalidateVisual();
+        // Don't call InvalidateVisual() here - let the caller do it after all updates
     }
 
     private void Primitives_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         InvalidateVisual();
+    }
+
+    private void Primitives2DViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        // Redraw when SelectedPrimitive changes to update point colors
+        if (e.PropertyName == nameof(Primitives2DViewModel.SelectedPrimitive))
+        {
+            InvalidateVisual();
+        }
     }
 
     public Preview2DControl()
@@ -106,6 +134,12 @@ public class Preview2DControl : Control
         if (_mainViewModel?.Primitives2DViewModel?.Primitives is INotifyCollectionChanged collection)
         {
             collection.CollectionChanged -= Primitives_CollectionChanged;
+        }
+        
+        // Unsubscribe from Primitives2DViewModel property changes
+        if (_mainViewModel?.Primitives2DViewModel != null)
+        {
+            _mainViewModel.Primitives2DViewModel.PropertyChanged -= Primitives2DViewModel_PropertyChanged;
         }
     }
 
@@ -419,6 +453,87 @@ public class Preview2DControl : Control
         }
     }
 
+    private Point2DPrimitive? FindPointUnderCursor(Point worldPoint, Point screenPoint, Preview2DViewModel vm)
+    {
+        if (_mainViewModel == null) return null;
+        
+        const double pointRadius = 3.0; // pixels - same as point radius
+        const double hoverTolerance = pointRadius; // Consider point hovered if cursor is within point radius
+        
+        Point2DPrimitive? nearestPoint = null;
+        double minDistanceScreen = hoverTolerance;
+        
+        // Find nearest point within hover tolerance
+        foreach (var primitive in _mainViewModel.Primitives2DViewModel.Primitives)
+        {
+            if (primitive is Point2DPrimitive point)
+            {
+                // Convert point to screen coordinates
+                var pointScreen = vm.WorldToScreen(new Point(point.X, point.Y));
+                
+                // Calculate distance in screen pixels
+                var dx = pointScreen.X - screenPoint.X;
+                var dy = pointScreen.Y - screenPoint.Y;
+                var distanceScreen = Math.Sqrt(dx * dx + dy * dy);
+                
+                // Check if point is within hover tolerance
+                if (distanceScreen <= hoverTolerance && distanceScreen < minDistanceScreen)
+                {
+                    minDistanceScreen = distanceScreen;
+                    nearestPoint = point;
+                }
+            }
+        }
+        
+        return nearestPoint;
+    }
+
+    private (Point snappedPoint, Point2DPrimitive? snappedXPoint, Point2DPrimitive? snappedYPoint) SnapToObjectsExcluding(Point worldPoint, MainViewModel mainViewModel, Preview2DViewModel vm, Point2DPrimitive? excludePoint)
+    {
+        const double snapTolerance = 5.0; // pixels tolerance for snapping
+        
+        Point2DPrimitive? nearestXPoint = null;
+        Point2DPrimitive? nearestYPoint = null;
+        double minXDistanceScreen = snapTolerance;
+        double minYDistanceScreen = snapTolerance;
+        
+        var worldPosScreen = vm.WorldToScreen(worldPoint);
+        
+        // Find nearest points on X and Y axes (excluding the moving point)
+        foreach (var primitive in mainViewModel.Primitives2DViewModel.Primitives)
+        {
+            if (primitive is Point2DPrimitive point && point != excludePoint)
+            {
+                // Convert object point to screen coordinates
+                var pointScreen = vm.WorldToScreen(new Point(point.X, point.Y));
+                
+                // Check distance in screen pixels
+                var distanceXScreen = Math.Abs(pointScreen.X - worldPosScreen.X);
+                var distanceYScreen = Math.Abs(pointScreen.Y - worldPosScreen.Y);
+                
+                // Check if point is close enough on X axis (within 5 pixels)
+                if (distanceXScreen <= snapTolerance && distanceXScreen < minXDistanceScreen)
+                {
+                    minXDistanceScreen = distanceXScreen;
+                    nearestXPoint = point;
+                }
+                
+                // Check if point is close enough on Y axis (within 5 pixels)
+                if (distanceYScreen <= snapTolerance && distanceYScreen < minYDistanceScreen)
+                {
+                    minYDistanceScreen = distanceYScreen;
+                    nearestYPoint = point;
+                }
+            }
+        }
+        
+        // Apply snapping
+        var snappedX = nearestXPoint != null ? nearestXPoint.X : worldPoint.X;
+        var snappedY = nearestYPoint != null ? nearestYPoint.Y : worldPoint.Y;
+        
+        return (new Point(snappedX, snappedY), nearestXPoint, nearestYPoint);
+    }
+
     private (Point snappedPoint, Point2DPrimitive? snappedXPoint, Point2DPrimitive? snappedYPoint) SnapToObjects(Point worldPoint, MainViewModel mainViewModel, Preview2DViewModel vm)
     {
         const double snapTolerance = 5.0; // pixels tolerance for snapping
@@ -469,11 +584,10 @@ public class Preview2DControl : Control
     {
         if (_mainViewModel == null || vm == null) return;
 
-        // Draw point primitives
-        var pointBrush = new SolidColorBrush(Color.FromRgb(0, 0, 255)); // Blue
         const double pointRadius = 3.0; // pixels (constant)
         const double pointThickness = 1.0; // pixels (constant)
-        var pointPen = new Pen(pointBrush, pointThickness);
+        
+        var selectedPrimitive = _mainViewModel.Primitives2DViewModel.SelectedPrimitive;
 
         foreach (var primitive in _mainViewModel.Primitives2DViewModel.Primitives)
         {
@@ -481,8 +595,34 @@ public class Preview2DControl : Control
             {
                 var pointScreen = vm.WorldToScreen(new Point(point.X, point.Y));
                 
-                // Draw point as circle (constant size in pixels, drawn in screen coordinates)
-                context.DrawEllipse(null, pointPen, pointScreen, pointRadius, pointRadius);
+                var isSelected = point == selectedPrimitive;
+                var isHovered = !_mainViewModel.IsPointModeActive && point == _hoveredPoint && !isSelected;
+                
+                if (isSelected)
+                {
+                    // Selected point: green outline without fill
+                    var greenBrush = new SolidColorBrush(Color.FromRgb(0, 255, 0)); // Green outline
+                    var greenPen = new Pen(greenBrush, pointThickness);
+                    context.DrawEllipse(null, greenPen, pointScreen, pointRadius, pointRadius);
+                }
+                else if (isHovered)
+                {
+                    // Hovered point: green fill with blue outline
+                    var fillBrush = new SolidColorBrush(Color.FromRgb(0, 255, 0)); // Green fill
+                    var outlineBrush = new SolidColorBrush(Color.FromRgb(0, 0, 255)); // Blue outline
+                    var outlinePen = new Pen(outlineBrush, pointThickness);
+                    // Draw filled circle first
+                    context.DrawEllipse(fillBrush, null, pointScreen, pointRadius, pointRadius);
+                    // Draw outline circle
+                    context.DrawEllipse(null, outlinePen, pointScreen, pointRadius, pointRadius);
+                }
+                else
+                {
+                    // Normal point: blue outline without fill
+                    var outlineBrush = new SolidColorBrush(Color.FromRgb(0, 0, 255)); // Blue outline
+                    var outlinePen = new Pen(outlineBrush, pointThickness);
+                    context.DrawEllipse(null, outlinePen, pointScreen, pointRadius, pointRadius);
+                }
             }
         }
     }
@@ -527,11 +667,15 @@ public class Preview2DControl : Control
     private void DrawObjectSnapLines(DrawingContext context, Rect bounds, Preview2DViewModel vm)
     {
         if (_mainViewModel == null || vm == null) return;
-        if (_snappedXPoint == null && _snappedYPoint == null) return;
         
-        // Check if we have valid world position (not default/zero)
-        if (_snappedWorldPos.X == 0 && _snappedWorldPos.Y == 0) return;
-
+        // Only draw snap lines if we have at least one snap point
+        // Draw lines in both point mode and point moving mode
+        // Check if we have snap points (either X or Y)
+        bool hasXSnap = _snappedXPoint != null;
+        bool hasYSnap = _snappedYPoint != null;
+        
+        if (!hasXSnap && !hasYSnap) return;
+        
         // Draw snap lines in screen coordinates
         var snapLineBrush = new SolidColorBrush(Color.FromRgb(0, 0, 255)); // Blue
         const double snapLineThickness = 1.0; // pixels (constant)
@@ -539,8 +683,6 @@ public class Preview2DControl : Control
         // Create dashed pen: 5 pixels dash, 3 pixels gap
         var dashStyle = new DashStyle(new[] { 5.0, 3.0 }, 0);
         var snapLinePen = new Pen(snapLineBrush, snapLineThickness, dashStyle: dashStyle);
-
-        var snappedScreen = vm.WorldToScreen(_snappedWorldPos);
 
         // Draw vertical line (X snap) - when snapping to X coordinate, draw vertical line
         if (_snappedXPoint != null)
@@ -582,37 +724,96 @@ public class Preview2DControl : Control
             // Check if point mode is active
             if (_mainViewModel?.IsPointModeActive == true)
             {
-                // Add point at clicked location
+                // Check if coordinates are locked - if both locked, point was already created
+                var pointProps = _mainViewModel.PointPropertiesViewModel;
+                if (pointProps.IsXLocked && pointProps.IsYLocked)
+                {
+                    // Point already created from locks, just return
+                    return;
+                }
+                
+                // Add point at clicked location (use locked coordinates if any)
                 var mousePos = e.GetPosition(this);
                 var worldPos = _viewModel.ScreenToWorld(mousePos);
                 
-                // Apply object snapping based on button state and Ctrl key
+                // Use locked coordinates if available
+                if (pointProps.IsXLocked)
+                {
+                    worldPos = new Point(pointProps.X, worldPos.Y);
+                }
+                if (pointProps.IsYLocked)
+                {
+                    worldPos = new Point(worldPos.X, pointProps.Y);
+                }
+                
+                // Apply object snapping based on button state and Ctrl key (only for unlocked coordinates)
                 var keyModifiers = e.KeyModifiers;
                 var shouldObjectSnap = ShouldObjectSnap(_mainViewModel.IsObjectSnapEnabled, keyModifiers.HasFlag(KeyModifiers.Control));
                 
                 if (shouldObjectSnap)
                 {
                     var snapResult = SnapToObjects(worldPos, _mainViewModel, _viewModel);
-                    worldPos = snapResult.snappedPoint;
+                    if (!pointProps.IsXLocked)
+                    {
+                        worldPos = new Point(snapResult.snappedPoint.X, worldPos.Y);
+                    }
+                    if (!pointProps.IsYLocked)
+                    {
+                        worldPos = new Point(worldPos.X, snapResult.snappedPoint.Y);
+                    }
                 }
                 
-                // Apply grid snapping based on button state and Shift key
+                // Apply grid snapping based on button state and Shift key (only for unlocked coordinates)
                 var shouldSnap = ShouldSnapToGrid(_mainViewModel.IsGridSnapEnabled, keyModifiers.HasFlag(KeyModifiers.Shift));
                 
                 if (shouldSnap)
                 {
-                    worldPos = SnapToGrid(worldPos, _mainViewModel.GridSnapStep);
+                    var snapped = SnapToGrid(worldPos, _mainViewModel.GridSnapStep);
+                    if (!pointProps.IsXLocked)
+                    {
+                        worldPos = new Point(snapped.X, worldPos.Y);
+                    }
+                    if (!pointProps.IsYLocked)
+                    {
+                        worldPos = new Point(worldPos.X, snapped.Y);
+                    }
                 }
                 
                 _mainViewModel.AddPointPrimitive(worldPos.X, worldPos.Y);
+                // Locks are reset in AddPointPrimitive method
             }
             else
             {
-                // Normal pan mode
-                _isPanning = true;
-                _lastPanPoint = e.GetPosition(this);
-                e.Pointer.Capture(this);
-                Focus();
+                // Not in point mode - check if clicking on a point to select/move it
+                var mousePos = e.GetPosition(this);
+                var worldPos = _viewModel.ScreenToWorld(mousePos);
+                var clickedPoint = FindPointUnderCursor(worldPos, mousePos, _viewModel);
+                
+                if (clickedPoint != null && _mainViewModel != null)
+                {
+                    // Start moving the point
+                    _isMovingPoint = true;
+                    _movingPoint = clickedPoint;
+                    _mainViewModel.Primitives2DViewModel.SelectedPrimitive = clickedPoint;
+                    _hoveredPoint = clickedPoint; // Keep hover state
+                    e.Pointer.Capture(this);
+                    Focus();
+                    InvalidateVisual();
+                }
+                else
+                {
+                    // Normal pan mode - clear hover
+                    if (_hoveredPoint != null)
+                    {
+                        _hoveredPoint = null;
+                        InvalidateVisual();
+                    }
+                    
+                    _isPanning = true;
+                    _lastPanPoint = e.GetPosition(this);
+                    e.Pointer.Capture(this);
+                    Focus();
+                }
             }
         }
     }
@@ -621,7 +822,50 @@ public class Preview2DControl : Control
     {
         base.OnPointerMoved(e);
 
-        if (_isPanning && _viewModel != null)
+        if (_isMovingPoint && _viewModel != null && _mainViewModel != null && _movingPoint != null)
+        {
+            // Move the point with snapping
+            var mousePos = e.GetPosition(this);
+            var worldPos = _viewModel.ScreenToWorld(mousePos);
+            
+            // Apply object snapping based on button state and Ctrl key
+            var keyModifiers = e.KeyModifiers;
+            var shouldObjectSnap = ShouldObjectSnap(_mainViewModel.IsObjectSnapEnabled, keyModifiers.HasFlag(KeyModifiers.Control));
+            
+            Point2DPrimitive? snappedXPoint = null;
+            Point2DPrimitive? snappedYPoint = null;
+            var worldPosAfterObjectSnap = worldPos; // Store position after object snap for drawing lines
+            
+            if (shouldObjectSnap)
+            {
+                // Snap to objects, but exclude the moving point itself
+                var snapResult = SnapToObjectsExcluding(worldPos, _mainViewModel, _viewModel, _movingPoint);
+                worldPosAfterObjectSnap = snapResult.snappedPoint;
+                worldPos = snapResult.snappedPoint;
+                snappedXPoint = snapResult.snappedXPoint;
+                snappedYPoint = snapResult.snappedYPoint;
+            }
+            
+            // Apply grid snapping based on button state and Shift key
+            var shouldSnap = ShouldSnapToGrid(_mainViewModel.IsGridSnapEnabled, keyModifiers.HasFlag(KeyModifiers.Shift));
+            
+            if (shouldSnap)
+            {
+                worldPos = SnapToGrid(worldPos, _mainViewModel.GridSnapStep);
+            }
+            
+            // Update point coordinates first
+            _movingPoint.X = worldPos.X;
+            _movingPoint.Y = worldPos.Y;
+            
+            // Update snap info for drawing snap lines AFTER updating point coordinates
+            // Set snap info synchronously to ensure values are set before redraw
+            SetObjectSnapInfo(snappedXPoint, snappedYPoint, worldPosAfterObjectSnap);
+            
+            // Invalidate visual after all updates to ensure snap lines are drawn
+            InvalidateVisual();
+        }
+        else if (_isPanning && _viewModel != null)
         {
             var currentPoint = e.GetPosition(this);
             var delta = currentPoint - _lastPanPoint;
@@ -633,16 +877,61 @@ public class Preview2DControl : Control
             
             _lastPanPoint = currentPoint;
         }
+        else if (!_isPanning && !_isMovingPoint && _viewModel != null && _mainViewModel != null)
+        {
+            // Check for hover effect when not in point mode and not panning/moving
+            if (!_mainViewModel.IsPointModeActive)
+            {
+                var mousePos = e.GetPosition(this);
+                var worldPos = _viewModel.ScreenToWorld(mousePos);
+                var hoveredPoint = FindPointUnderCursor(worldPos, mousePos, _viewModel);
+                
+                if (_hoveredPoint != hoveredPoint)
+                {
+                    _hoveredPoint = hoveredPoint;
+                    InvalidateVisual(); // Redraw to update point colors
+                }
+            }
+            else
+            {
+                // Clear hover when entering point mode
+                if (_hoveredPoint != null)
+                {
+                    _hoveredPoint = null;
+                    InvalidateVisual();
+                }
+            }
+        }
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
         
-        if (_isPanning)
+        if (_isMovingPoint)
+        {
+            _isMovingPoint = false;
+            _movingPoint = null;
+            SetObjectSnapInfo(null, null, default); // Clear snap lines
+            e.Pointer.Capture(null);
+            InvalidateVisual();
+        }
+        else if (_isPanning)
         {
             _isPanning = false;
             e.Pointer.Capture(null);
+        }
+    }
+
+    protected override void OnPointerExited(PointerEventArgs e)
+    {
+        base.OnPointerExited(e);
+        
+        // Clear hover when pointer leaves the control
+        if (_hoveredPoint != null)
+        {
+            _hoveredPoint = null;
+            InvalidateVisual();
         }
     }
 

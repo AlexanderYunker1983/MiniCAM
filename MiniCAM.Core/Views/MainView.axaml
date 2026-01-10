@@ -65,16 +65,30 @@
         <ColumnDefinition Width="{Binding RightPanelWidth}" />
       </Grid.ColumnDefinitions>
 
-      <!-- Left column: Operation properties -->
+      <!-- Left column: Operation properties / Point properties -->
       <Border Grid.Column="0"
               Margin="4"
-              Padding="8"
+              Padding="0"
               BorderThickness="1"
               BorderBrush="{DynamicResource ThemeBorderLowBrush}"
               IsVisible="{Binding IsLeftPanelVisible}">
-        <TextBlock Text="{Binding OperationPropertiesText}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center" />
+        <Grid>
+          <!-- Show point properties when point mode is active and point is selected -->
+          <ContentControl Content="{Binding PointPropertiesViewModel}"
+                         IsVisible="{Binding IsPointPropertiesVisible}">
+            <ContentControl.ContentTemplate>
+              <DataTemplate>
+                <views:PointPropertiesView />
+              </DataTemplate>
+            </ContentControl.ContentTemplate>
+          </ContentControl>
+          <!-- Show default text when not showing point properties -->
+          <TextBlock Text="{Binding OperationPropertiesText}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Margin="8"
+                     IsVisible="{Binding !IsPointPropertiesVisible}" />
+        </Grid>
       </Border>
 
       <!-- Splitter between left and center -->

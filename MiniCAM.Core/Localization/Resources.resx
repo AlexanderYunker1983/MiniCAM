@@ -260,7 +260,7 @@
     <value>Z</value>
   </data>
   <data name="OperationProperties" xml:space="preserve">
-    <value>Operation Properties</value>
+    <value>Properties</value>
   </data>
   <data name="Preview2D" xml:space="preserve">
     <value>2D Preview</value>
@@ -303,6 +303,12 @@
   </data>
   <data name="CodeGenDecimalPlaces" xml:space="preserve">
     <value>Decimal places</value>
+  </data>
+  <data name="CoordinateX" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="CoordinateY" xml:space="preserve">
+    <value>Y</value>
   </data>
 </root>
 

@@ -40,6 +40,20 @@ public partial class Preview2DView : UserControl
         if (DataContext is not Preview2DViewModel vm || _tooltip == null || _coordinatesText == null) return;
         
         var mainViewModel = GetMainViewModel();
+        
+        // Check if point is being moved (handled by Preview2DControl)
+        // If so, don't interfere with snap info set by Preview2DControl
+        if (PreviewControl != null)
+        {
+            var currentPoint = e.GetCurrentPoint(PreviewControl);
+            if (currentPoint.Properties.IsLeftButtonPressed)
+            {
+                // Point might be moving - let Preview2DControl handle it
+                // Don't clear snap info here
+                return;
+            }
+        }
+        
         if (mainViewModel?.IsPointModeActive == true)
         {
             var mousePos = e.GetPosition(this);
@@ -69,10 +83,63 @@ public partial class Preview2DView : UserControl
                 worldPos = SnapToGrid(worldPos, mainViewModel.GridSnapStep);
             }
             
+            // Apply coordinate locks from point properties
+            var pointProps = mainViewModel.PointPropertiesViewModel;
+            if (pointProps.IsXLocked)
+            {
+                worldPos = new Point(pointProps.X, worldPos.Y);
+            }
+            if (pointProps.IsYLocked)
+            {
+                worldPos = new Point(worldPos.X, pointProps.Y);
+            }
+            
+            // Re-apply snapping after locks (if coordinates were changed by locks)
+            if (pointProps.IsXLocked || pointProps.IsYLocked)
+            {
+                // Re-apply object snapping if enabled
+                if (shouldObjectSnap)
+                {
+                    var snapResult = SnapToObjects(worldPos, mainViewModel, vm);
+                    // Only apply snapping to unlocked coordinates
+                    if (!pointProps.IsXLocked)
+                    {
+                        worldPos = new Point(snapResult.snappedPoint.X, worldPos.Y);
+                        snappedXPoint = snapResult.snappedXPoint;
+                    }
+                    if (!pointProps.IsYLocked)
+                    {
+                        worldPos = new Point(worldPos.X, snapResult.snappedPoint.Y);
+                        snappedYPoint = snapResult.snappedYPoint;
+                    }
+                }
+                
+                // Re-apply grid snapping if enabled
+                if (shouldSnap)
+                {
+                    var snapped = SnapToGrid(worldPos, mainViewModel.GridSnapStep);
+                    if (!pointProps.IsXLocked)
+                    {
+                        worldPos = new Point(snapped.X, worldPos.Y);
+                    }
+                    if (!pointProps.IsYLocked)
+                    {
+                        worldPos = new Point(worldPos.X, snapped.Y);
+                    }
+                }
+            }
+            
             // Store snap info for drawing
             PreviewControl?.SetObjectSnapInfo(snappedXPoint, snappedYPoint, worldPos);
+            PreviewControl?.InvalidateVisual(); // Ensure visual is invalidated after setting snap info
             
             _coordinatesText.Text = $"X: {worldPos.X:F3}; Y: {worldPos.Y:F3}";
+            
+            // Update point properties view model with cursor position (only unlocked coordinates)
+            if (mainViewModel.PointPropertiesViewModel.SelectedPoint == null)
+            {
+                mainViewModel.PointPropertiesViewModel.CursorPosition = worldPos;
+            }
             
             // Position tooltip near cursor
             var tooltipOffset = 15.0;
@@ -86,7 +153,12 @@ public partial class Preview2DView : UserControl
         }
         else
         {
-            PreviewControl?.SetObjectSnapInfo(null, null, default);
+            // Only clear snap info if left button is not pressed (not moving a point)
+            if (!e.GetCurrentPoint(PreviewControl).Properties.IsLeftButtonPressed)
+            {
+                PreviewControl?.SetObjectSnapInfo(null, null, default);
+                PreviewControl?.InvalidateVisual(); // Ensure visual is invalidated after clearing snap info
+            }
             if (_tooltip.IsVisible)
             {
                 _tooltip.IsVisible = false;

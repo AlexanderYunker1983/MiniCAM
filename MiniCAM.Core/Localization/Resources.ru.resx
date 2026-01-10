@@ -319,7 +319,7 @@
     <value>Z</value>
   </data>
   <data name="OperationProperties" xml:space="preserve">
-    <value>Свойства операции</value>
+    <value>Свойства</value>
   </data>
   <data name="Preview2D" xml:space="preserve">
     <value>2D-предпросмотр</value>
@@ -362,5 +362,11 @@
   </data>
   <data name="CodeGenDecimalPlaces" xml:space="preserve">
     <value>Количество знаков после запятой</value>
+  </data>
+  <data name="CoordinateX" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="CoordinateY" xml:space="preserve">
+    <value>Y</value>
   </data>
 </root>

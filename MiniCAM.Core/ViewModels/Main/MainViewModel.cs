@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MiniCAM.Core.CodeGeneration;
@@ -34,6 +35,43 @@ public partial class MainViewModel : LocalizedViewModelBase
         
         // Initialize 2D Primitives ViewModel
         Primitives2DViewModel = new Primitives2DViewModel();
+        
+        // Initialize Point Properties ViewModel
+        PointPropertiesViewModel = new PointPropertiesViewModel();
+        
+        // Subscribe to point creation from locked coordinates
+        PointPropertiesViewModel.PointCreatedFromLock += (x, y) =>
+        {
+            // Create the point
+            // Note: Locks are already reset in PointPropertiesViewModel before this event is raised
+            AddPointPrimitive(x, y);
+        };
+        
+        // Subscribe to selected primitive changes
+        Primitives2DViewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(Primitives2DViewModel.SelectedPrimitive))
+            {
+                UpdatePointProperties();
+            }
+        };
+        
+        // Subscribe to point mode changes
+        PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(IsPointModeActive))
+            {
+                UpdatePointProperties();
+                // Disable selection in primitives list when in point mode
+                Primitives2DViewModel.IsSelectionEnabled = !IsPointModeActive;
+                // Reset locks when exiting point mode
+                if (!IsPointModeActive)
+                {
+                    PointPropertiesViewModel.IsXLocked = false;
+                    PointPropertiesViewModel.IsYLocked = false;
+                }
+            }
+        };
         
         // Sync operations between MainViewModel and Preview2DViewModel
         Operations.CollectionChanged += (s, e) =>
@@ -146,6 +184,9 @@ public partial class MainViewModel : LocalizedViewModelBase
     // 2D Primitives ViewModel
     public Primitives2DViewModel Primitives2DViewModel { get; }
 
+    // Point Properties ViewModel
+    public PointPropertiesViewModel PointPropertiesViewModel { get; }
+
     // Panel visibility controls
     [ObservableProperty]
     private bool _isLeftPanelVisible = true;
@@ -172,9 +213,9 @@ public partial class MainViewModel : LocalizedViewModelBase
     }
 
     // Column widths - collapse to 0 when panel is hidden
-    public GridLength LeftPanelWidth => IsLeftPanelVisible ? new GridLength(2, GridUnitType.Star) : new GridLength(0);
+    public GridLength LeftPanelWidth => IsLeftPanelVisible ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
     
-    public GridLength RightPanelWidth => IsRightPanelVisible ? new GridLength(2, GridUnitType.Star) : new GridLength(0);
+    public GridLength RightPanelWidth => IsRightPanelVisible ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
     
     public GridLength LeftSplitterWidth => IsLeftPanelVisible ? GridLength.Auto : new GridLength(0);
     
@@ -215,6 +256,46 @@ public partial class MainViewModel : LocalizedViewModelBase
         var pointName = Resources.PrimitivePoint;
         var point = new Point2DPrimitive(x, y, pointName);
         Primitives2DViewModel.Primitives.Add(point);
+        
+        // Don't select the newly added point - keep current selection or no selection
+        // This allows continuous point addition without changing selection
+        
+        // Reset locks after adding point (if not already reset)
+        // This handles the case when point is added via click, not via locks
+        if (PointPropertiesViewModel.IsXLocked || PointPropertiesViewModel.IsYLocked)
+        {
+            PointPropertiesViewModel.IsXLocked = false;
+            PointPropertiesViewModel.IsYLocked = false;
+        }
+        
+        // Keep point mode active for adding more points
+        IsPointModeActive = true;
+    }
+
+    [ObservableProperty]
+    private bool _isPointPropertiesVisible = false;
+
+    private void UpdatePointProperties()
+    {
+        // Show point properties if point mode is active OR a point is selected
+        if (IsPointModeActive || Primitives2DViewModel.SelectedPrimitive is Point2DPrimitive)
+        {
+            if (Primitives2DViewModel.SelectedPrimitive is Point2DPrimitive selectedPoint)
+            {
+                PointPropertiesViewModel.SelectedPoint = selectedPoint;
+            }
+            else
+            {
+                // In point mode but no point selected - show empty properties (will track cursor)
+                PointPropertiesViewModel.SelectedPoint = null;
+            }
+            IsPointPropertiesVisible = true;
+        }
+        else
+        {
+            PointPropertiesViewModel.SelectedPoint = null;
+            IsPointPropertiesVisible = false;
+        }
     }
 
     [RelayCommand]

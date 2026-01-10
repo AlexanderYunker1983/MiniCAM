@@ -26,7 +26,8 @@
       <!-- Primitives list with cascading children -->
       <TreeView Grid.Row="1"
                 ItemsSource="{Binding Primitives}"
-                SelectedItem="{Binding SelectedPrimitive, Mode=TwoWay}">
+                SelectedItem="{Binding SelectedPrimitive, Mode=TwoWay}"
+                IsEnabled="{Binding IsSelectionEnabled}">
         <TreeView.DataTemplates>
           <TreeDataTemplate ItemsSource="{Binding Children}"
                             DataType="vm:Primitive2DItem">
