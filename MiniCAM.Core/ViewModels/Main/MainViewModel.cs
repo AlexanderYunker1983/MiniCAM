@@ -12,6 +12,7 @@ using CommunityToolkit.Mvvm.Input;
 using MiniCAM.Core.CodeGeneration;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
+using MiniCAM.Core.ViewModels.Main;
 using MiniCAM.Core.Views;
 
 namespace MiniCAM.Core.ViewModels;
@@ -28,9 +29,29 @@ public partial class MainViewModel : LocalizedViewModelBase
     {
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         
-        // Subscribe to collection changes to update command availability
-        Operations.CollectionChanged += (s, e) => UpdateCommandAvailability();
+        // Initialize 2D Preview ViewModel
+        Preview2DViewModel = new Preview2DViewModel();
+        
+        // Initialize 2D Primitives ViewModel
+        Primitives2DViewModel = new Primitives2DViewModel();
+        
+        // Sync operations between MainViewModel and Preview2DViewModel
+        Operations.CollectionChanged += (s, e) =>
+        {
+            UpdateCommandAvailability();
+            SyncOperationsToPreview();
+        };
+        
         GCodeLines.CollectionChanged += (s, e) => UpdateGCodeCommandAvailability();
+    }
+
+    private void SyncOperationsToPreview()
+    {
+        Preview2DViewModel.Operations.Clear();
+        foreach (var operation in Operations)
+        {
+            Preview2DViewModel.Operations.Add(operation);
+        }
     }
 
     protected override void UpdateLocalizedStrings()
@@ -38,7 +59,7 @@ public partial class MainViewModel : LocalizedViewModelBase
         MenuSettingsText = Resources.MenuSettings;
         MenuApplicationSettingsText = Resources.MenuApplicationSettings;
         MenuCodeGenerationSettingsText = Resources.MenuCodeGenerationSettings;
-        RibbonTabDrillingText = Resources.RibbonTabDrilling;
+        RibbonTabDrillingText = Resources.RibbonTab2DPrimitives;
         RibbonTabPocketText = Resources.RibbonTabPocket;
         RibbonTabProfileText = Resources.RibbonTabProfile;
         RibbonTabOtherText = Resources.RibbonTabOther;
@@ -46,6 +67,10 @@ public partial class MainViewModel : LocalizedViewModelBase
         Preview2DText = Resources.Preview2D;
         OperationsListText = Resources.OperationsList;
         GCodeText = Resources.GCode;
+        Primitives2DText = Resources.Primitives2D;
+        PointButtonText = Resources.ButtonPoint;
+        GridSnapButtonText = Resources.ButtonGridSnap;
+        ObjectSnapButtonText = Resources.ButtonObjectSnap;
         GenerateButtonText = Resources.ButtonGenerate;
         SaveButtonText = Resources.ButtonSave;
     }
@@ -87,16 +112,82 @@ public partial class MainViewModel : LocalizedViewModelBase
     private string _gCodeText = Resources.GCode;
 
     [ObservableProperty]
+    private string _primitives2DText = Resources.Primitives2D;
+
+    [ObservableProperty]
+    private string _pointButtonText = Resources.ButtonPoint;
+
+    [ObservableProperty]
+    private bool _isPointModeActive = false;
+
+    [ObservableProperty]
+    private bool _isGridSnapEnabled = false;
+
+    [ObservableProperty]
+    private double _gridSnapStep = 1.0; // Default snap step: 1mm
+
+    [ObservableProperty]
+    private string _gridSnapButtonText = Resources.ButtonGridSnap;
+
+    [ObservableProperty]
+    private bool _isObjectSnapEnabled = false;
+
+    [ObservableProperty]
+    private string _objectSnapButtonText = Resources.ButtonObjectSnap;
+
+    public double[] GridSnapSteps { get; } = new[] { 10.0, 5.0, 2.5, 1.0, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001 };
+
+    [ObservableProperty]
     private string _generateButtonText = Resources.ButtonGenerate;
 
     [ObservableProperty]
     private string _saveButtonText = Resources.ButtonSave;
+
+    // 2D Primitives ViewModel
+    public Primitives2DViewModel Primitives2DViewModel { get; }
+
+    // Panel visibility controls
+    [ObservableProperty]
+    private bool _isLeftPanelVisible = true;
+
+    [ObservableProperty]
+    private bool _isRightPanelVisible = true;
+
+    [ObservableProperty]
+    private string _leftButtonContent = "<<";
+
+    [ObservableProperty]
+    private string _rightButtonContent = ">>";
+
+    partial void OnIsLeftPanelVisibleChanged(bool oldValue, bool newValue)
+    {
+        OnPropertyChanged(nameof(LeftPanelWidth));
+        OnPropertyChanged(nameof(LeftSplitterWidth));
+    }
+
+    partial void OnIsRightPanelVisibleChanged(bool oldValue, bool newValue)
+    {
+        OnPropertyChanged(nameof(RightPanelWidth));
+        OnPropertyChanged(nameof(RightSplitterWidth));
+    }
+
+    // Column widths - collapse to 0 when panel is hidden
+    public GridLength LeftPanelWidth => IsLeftPanelVisible ? new GridLength(2, GridUnitType.Star) : new GridLength(0);
+    
+    public GridLength RightPanelWidth => IsRightPanelVisible ? new GridLength(2, GridUnitType.Star) : new GridLength(0);
+    
+    public GridLength LeftSplitterWidth => IsLeftPanelVisible ? GridLength.Auto : new GridLength(0);
+    
+    public GridLength RightSplitterWidth => IsRightPanelVisible ? GridLength.Auto : new GridLength(0);
 
     // Operations list
     public ObservableCollection<OperationItem> Operations { get; } = new();
 
     // G-code lines list
     public ObservableCollection<string> GCodeLines { get; } = new();
+
+    // 2D Preview ViewModel
+    public Preview2DViewModel Preview2DViewModel { get; }
 
     [ObservableProperty]
     private OperationItem? _selectedOperation;
@@ -109,6 +200,22 @@ public partial class MainViewModel : LocalizedViewModelBase
     // Controls visibility of the ribbon tab content block.
     [ObservableProperty]
     private bool _isRibbonContentVisible = true;
+
+    [RelayCommand]
+    private void TogglePointMode()
+    {
+        IsPointModeActive = !IsPointModeActive;
+    }
+
+    /// <summary>
+    /// Adds a point primitive at the specified world coordinates.
+    /// </summary>
+    public void AddPointPrimitive(double x, double y)
+    {
+        var pointName = Resources.PrimitivePoint;
+        var point = new Point2DPrimitive(x, y, pointName);
+        Primitives2DViewModel.Primitives.Add(point);
+    }
 
     [RelayCommand]
     private void OpenApplicationSettings()
@@ -232,6 +339,20 @@ public partial class MainViewModel : LocalizedViewModelBase
         {
             GCodeLines.Add(line);
         }
+    }
+
+    [RelayCommand]
+    private void ToggleLeftPanel()
+    {
+        IsLeftPanelVisible = !IsLeftPanelVisible;
+        LeftButtonContent = IsLeftPanelVisible ? "<<" : ">>";
+    }
+
+    [RelayCommand]
+    private void ToggleRightPanel()
+    {
+        IsRightPanelVisible = !IsRightPanelVisible;
+        RightButtonContent = IsRightPanelVisible ? ">>" : "<<";
     }
 
     [RelayCommand(CanExecute = nameof(CanSaveGCode))]

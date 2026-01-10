@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MiniCAM.Core.ViewModels.Main"
+             xmlns:views="using:MiniCAM.Core.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MiniCAM.Core.Views.Preview2DView"
+             x:DataType="vm:Preview2DViewModel">
+  <Grid>
+    <views:Preview2DControl x:Name="PreviewControl" ViewModel="{Binding}" />
+    <Canvas IsHitTestVisible="False">
+      <Border x:Name="CoordinatesTooltip"
+              IsVisible="False"
+              Background="{DynamicResource ThemeControlBackgroundBrush}"
+              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+              BorderThickness="1"
+              Padding="6,4"
+              CornerRadius="4"
+              ZIndex="1000">
+        <TextBlock x:Name="CoordinatesText"
+                   FontSize="12" />
+      </Border>
+    </Canvas>
+  </Grid>
+</UserControl>

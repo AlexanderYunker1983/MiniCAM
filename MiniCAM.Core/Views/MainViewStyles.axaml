@@ -68,6 +68,31 @@
     <Setter Property="Background" Value="{DynamicResource GridSplitterBrush}" />
     <Setter Property="Cursor" Value="SizeWestEast" />
   </Style>
+
+  <!-- Style for circular overlay buttons on 2D preview -->
+  <Style Selector="Button.CircularOverlayButton">
+    <Setter Property="Width" Value="40" />
+    <Setter Property="Height" Value="40" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource ThemeControlBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource CircularOverlayButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!-- Hover state for circular overlay buttons -->
+  <Style Selector="Button.CircularOverlayButton:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!-- Pressed state for circular overlay buttons -->
+  <Style Selector="Button.CircularOverlayButton:pressed">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
 </Styles>
 
 

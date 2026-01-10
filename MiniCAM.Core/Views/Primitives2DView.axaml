@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MiniCAM.Core.ViewModels.Main"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+             x:Class="MiniCAM.Core.Views.Primitives2DView"
+             x:DataType="vm:Primitives2DViewModel">
+  <Border BorderThickness="1"
+          BorderBrush="{DynamicResource TabContentBorderBrush}"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch">
+    <Grid RowDefinitions="Auto,*">
+      <!-- Toolbar with delete button -->
+      <Border Grid.Row="0"
+              BorderThickness="0,0,0,1"
+              BorderBrush="{DynamicResource TabContentBorderBrush}"
+              Padding="4">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <Button Command="{Binding DeletePrimitiveCommand}"
+                  Content="{Binding DeleteButtonText}"
+                  Padding="8,4" />
+        </StackPanel>
+      </Border>
+      
+      <!-- Primitives list with cascading children -->
+      <TreeView Grid.Row="1"
+                ItemsSource="{Binding Primitives}"
+                SelectedItem="{Binding SelectedPrimitive, Mode=TwoWay}">
+        <TreeView.DataTemplates>
+          <TreeDataTemplate ItemsSource="{Binding Children}"
+                            DataType="vm:Primitive2DItem">
+            <TextBlock Text="{Binding Name}" />
+          </TreeDataTemplate>
+          <TreeDataTemplate DataType="vm:Primitive2DChildItem">
+            <TextBlock Text="{Binding Text}" />
+          </TreeDataTemplate>
+        </TreeView.DataTemplates>
+      </TreeView>
+    </Grid>
+  </Border>
+</UserControl>

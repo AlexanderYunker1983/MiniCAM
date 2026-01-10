@@ -95,6 +95,7 @@ public static class Resources
 
     // Ribbon tab headers
     public static string RibbonTabDrilling => GetString(nameof(RibbonTabDrilling), "Drilling");
+    public static string RibbonTab2DPrimitives => GetString(nameof(RibbonTab2DPrimitives), "2D Primitives");
     public static string RibbonTabPocket => GetString(nameof(RibbonTabPocket), "Pocket");
     public static string RibbonTabProfile => GetString(nameof(RibbonTabProfile), "Profile");
     public static string RibbonTabOther => GetString(nameof(RibbonTabOther), "Other");
@@ -171,6 +172,12 @@ public static class Resources
     public static string GCode => GetString(nameof(GCode), "G-code");
     public static string ButtonGenerate => GetString(nameof(ButtonGenerate), "Generate");
     public static string ButtonSave => GetString(nameof(ButtonSave), "Save");
+    public static string ButtonDelete => GetString(nameof(ButtonDelete), "Delete");
+    public static string Primitives2D => GetString(nameof(Primitives2D), "2D Primitives");
+    public static string ButtonPoint => GetString(nameof(ButtonPoint), "Point");
+    public static string PrimitivePoint => GetString(nameof(PrimitivePoint), "Point");
+    public static string ButtonGridSnap => GetString(nameof(ButtonGridSnap), "Grid Snap");
+    public static string ButtonObjectSnap => GetString(nameof(ButtonObjectSnap), "Object Snap");
     public static string GCodeProgram => GetString(nameof(GCodeProgram), "Program");
     public static string GCodeFileCreated => GetString(nameof(GCodeFileCreated), "File created:");
     public static string CodeGenDecimalPlaces => GetString(nameof(CodeGenDecimalPlaces), "Decimal places");

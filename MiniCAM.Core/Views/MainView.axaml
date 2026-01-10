@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MiniCAM.Core.ViewModels"
+             xmlns:views="clr-namespace:MiniCAM.Core.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MiniCAM.Core.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -41,50 +42,8 @@
           <Border Classes="RibbonTabContent"
                   IsVisible="{Binding IsRibbonContentVisible}">
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Content="TEST" />
-              <Button Content="TEST" />
-            </StackPanel>
-          </Border>
-        </TabItem>
-        <!-- Pocket operations tab -->
-        <TabItem IsEnabled="False">
-          <TabItem.Header>
-            <TextBlock Text="{Binding RibbonTabPocketText}"
-                       FontSize="{StaticResource RibbonTabHeaderFontSize}" />
-          </TabItem.Header>
-          <Border Classes="RibbonTabContent"
-                  IsVisible="{Binding IsRibbonContentVisible}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Content="TEST" />
-              <Button Content="TEST" />
-            </StackPanel>
-          </Border>
-        </TabItem>
-        <!-- Profile operations tab -->
-        <TabItem IsEnabled="False">
-          <TabItem.Header>
-            <TextBlock Text="{Binding RibbonTabProfileText}"
-                       FontSize="{StaticResource RibbonTabHeaderFontSize}" />
-          </TabItem.Header>
-          <Border Classes="RibbonTabContent"
-                  IsVisible="{Binding IsRibbonContentVisible}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Content="TEST" />
-              <Button Content="TEST" />
-            </StackPanel>
-          </Border>
-        </TabItem>
-        <!-- Other operations tab -->
-        <TabItem IsEnabled="False">
-          <TabItem.Header>
-            <TextBlock Text="{Binding RibbonTabOtherText}"
-                       FontSize="{StaticResource RibbonTabHeaderFontSize}" />
-          </TabItem.Header>
-          <Border Classes="RibbonTabContent"
-                  IsVisible="{Binding IsRibbonContentVisible}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Button Content="TEST" />
-              <Button Content="TEST" />
+              <ToggleButton Content="{Binding PointButtonText}"
+                           IsChecked="{Binding IsPointModeActive, Mode=TwoWay}" />
             </StackPanel>
           </Border>
         </TabItem>
@@ -95,15 +54,15 @@
     <Grid>
       <Grid.ColumnDefinitions>
         <!-- Left: operation properties -->
-        <ColumnDefinition Width="2*" MinWidth="150" />
+        <ColumnDefinition Width="{Binding LeftPanelWidth}" />
         <!-- Splitter between left and center -->
-        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="{Binding LeftSplitterWidth}" />
         <!-- Center: 2D preview -->
         <ColumnDefinition Width="3*" MinWidth="200" />
         <!-- Splitter between center and right -->
-        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="{Binding RightSplitterWidth}" />
         <!-- Right: operations list / G-code -->
-        <ColumnDefinition Width="2*" MinWidth="200" />
+        <ColumnDefinition Width="{Binding RightPanelWidth}" />
       </Grid.ColumnDefinitions>
 
       <!-- Left column: Operation properties -->
@@ -111,7 +70,8 @@
               Margin="4"
               Padding="8"
               BorderThickness="1"
-              BorderBrush="{DynamicResource ThemeBorderLowBrush}">
+              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+              IsVisible="{Binding IsLeftPanelVisible}">
         <TextBlock Text="{Binding OperationPropertiesText}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center" />
@@ -124,17 +84,81 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     ResizeDirection="Columns"
-                    ShowsPreview="True" />
+                    ShowsPreview="True"
+                    IsVisible="{Binding IsLeftPanelVisible}" />
 
       <!-- Center column: 2D preview -->
       <Border Grid.Column="2"
               Margin="4"
-              Padding="8"
+              Padding="0"
               BorderThickness="1"
               BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-        <TextBlock Text="{Binding Preview2DText}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center" />
+        <Grid>
+          <views:Preview2DView DataContext="{Binding Preview2DViewModel}"
+                               x:Name="Preview2DViewControl" />
+          
+          <!-- Overlay buttons on top of 2D preview -->
+          <Grid>
+            <!-- Left button: controls left panel -->
+            <Button Classes="CircularOverlayButton"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="0, 8,0,0"
+                    ZIndex="100"
+                    Command="{Binding ToggleLeftPanelCommand}">
+              <TextBlock Text="{Binding LeftButtonContent}"
+                         FontSize="16"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+            </Button>
+            
+            <!-- Right button: controls right panel -->
+            <Button Classes="CircularOverlayButton"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="0,8,0,0"
+                    ZIndex="100"
+                    Command="{Binding ToggleRightPanelCommand}">
+              <TextBlock Text="{Binding RightButtonContent}"
+                         FontSize="16"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+            </Button>
+            
+            <!-- Center panel: grid snap button and step selector -->
+            <Border HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="0,8,0,0"
+                    ZIndex="100"
+                    Background="{DynamicResource ThemeControlBackgroundBrush}"
+                    Opacity="0.8"
+                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="0">
+              <StackPanel Orientation="Horizontal" Spacing="0">
+                <ToggleButton Content="{Binding GridSnapButtonText}"
+                             IsChecked="{Binding IsGridSnapEnabled, Mode=TwoWay}"
+                             Padding="8,4"
+                             BorderThickness="1,0,0,0"
+                             BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                             CornerRadius="4,0,0,4" />
+                <ComboBox ItemsSource="{Binding GridSnapSteps}"
+                         SelectedItem="{Binding GridSnapStep, Mode=TwoWay}"
+                         MinWidth="80"
+                         Padding="4,4"
+                         BorderThickness="0,0,1,0"
+                         BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                         CornerRadius="0" />
+                <ToggleButton Content="{Binding ObjectSnapButtonText}"
+                             IsChecked="{Binding IsObjectSnapEnabled, Mode=TwoWay}"
+                             Padding="8,4"
+                             BorderThickness="0"
+                             CornerRadius="0,4,4,0" />
+              </StackPanel>
+            </Border>
+          </Grid>
+        </Grid>
       </Border>
 
       <!-- Splitter between center and right -->
@@ -144,12 +168,14 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     ResizeDirection="Columns"
-                    ShowsPreview="True" />
+                    ShowsPreview="True"
+                    IsVisible="{Binding IsRightPanelVisible}" />
 
       <!-- Right column: TabControl with operations list and G-code -->
       <Border Grid.Column="4"
               Margin="4"
-              Padding="0">
+              Padding="0"
+              IsVisible="{Binding IsRightPanelVisible}">
         <TabControl>
           <TabItem Header="{Binding OperationsListText}">
             <Border BorderThickness="1"
@@ -215,6 +241,10 @@
                 </ListBox>
               </Grid>
             </Border>
+          </TabItem>
+          <TabItem Header="{Binding Primitives2DText}">
+            <views:Primitives2DView DataContext="{Binding Primitives2DViewModel}" 
+                                    Margin="-11,0,0,0"/>
           </TabItem>
           <TabItem Header="{Binding GCodeText}">
             <Border BorderThickness="1"

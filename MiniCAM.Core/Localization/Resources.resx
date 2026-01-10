@@ -79,6 +79,9 @@
   <data name="RibbonTabDrilling" xml:space="preserve">
     <value>Drilling</value>
   </data>
+  <data name="RibbonTab2DPrimitives" xml:space="preserve">
+    <value>2D Primitives</value>
+  </data>
   <data name="RibbonTabPocket" xml:space="preserve">
     <value>Pocket</value>
   </data>
@@ -273,6 +276,24 @@
   </data>
   <data name="ButtonSave" xml:space="preserve">
     <value>Save</value>
+  </data>
+  <data name="ButtonDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Primitives2D" xml:space="preserve">
+    <value>2D Primitives</value>
+  </data>
+  <data name="ButtonPoint" xml:space="preserve">
+    <value>Point</value>
+  </data>
+  <data name="PrimitivePoint" xml:space="preserve">
+    <value>Point</value>
+  </data>
+  <data name="ButtonGridSnap" xml:space="preserve">
+    <value>Grid Snap</value>
+  </data>
+  <data name="ButtonObjectSnap" xml:space="preserve">
+    <value>Object Snap</value>
   </data>
   <data name="GCodeProgram" xml:space="preserve">
     <value>Program</value>

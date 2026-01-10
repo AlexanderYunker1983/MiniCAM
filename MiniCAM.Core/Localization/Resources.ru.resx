@@ -138,6 +138,9 @@
   <data name="RibbonTabDrilling" xml:space="preserve">
     <value>Сверление</value>
   </data>
+  <data name="RibbonTab2DPrimitives" xml:space="preserve">
+    <value>2D-примитивы</value>
+  </data>
   <data name="RibbonTabPocket" xml:space="preserve">
     <value>Карман</value>
   </data>
@@ -332,6 +335,24 @@
   </data>
   <data name="ButtonSave" xml:space="preserve">
     <value>Сохранить</value>
+  </data>
+  <data name="ButtonDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Primitives2D" xml:space="preserve">
+    <value>2D-примитивы</value>
+  </data>
+  <data name="ButtonPoint" xml:space="preserve">
+    <value>Точка</value>
+  </data>
+  <data name="PrimitivePoint" xml:space="preserve">
+    <value>Точка</value>
+  </data>
+  <data name="ButtonGridSnap" xml:space="preserve">
+    <value>Привязка к сетке</value>
+  </data>
+  <data name="ButtonObjectSnap" xml:space="preserve">
+    <value>Привязка к объектам</value>
   </data>
   <data name="GCodeProgram" xml:space="preserve">
     <value>Program</value>

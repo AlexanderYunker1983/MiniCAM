@@ -23,6 +23,7 @@
             <Color x:Key="RibbonButtonPressedBackgroundColor">#ffe0e0e0</Color>
             <Color x:Key="GridSplitterColor">#666666</Color>
             <Color x:Key="TabContentBorderColor">#d0d6dd</Color>
+            <Color x:Key="CircularOverlayButtonBorderColor">#a0a0a0</Color>
             <SolidColorBrush x:Key="RibbonBackgroundBrush"
                              Color="{StaticResource RibbonBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonBorderBrush"
@@ -41,6 +42,8 @@
                              Color="{StaticResource GridSplitterColor}" />
             <SolidColorBrush x:Key="TabContentBorderBrush"
                              Color="{StaticResource TabContentBorderColor}" />
+            <SolidColorBrush x:Key="CircularOverlayButtonBorderBrush"
+                             Color="{StaticResource CircularOverlayButtonBorderColor}" />
           </ResourceDictionary>
 
           <!-- Dark theme colors -->
@@ -54,6 +57,11 @@
             <Color x:Key="RibbonButtonPressedBackgroundColor">#565e6c</Color>
             <Color x:Key="GridSplitterColor">#888888</Color>
             <Color x:Key="TabContentBorderColor">#3a4049</Color>
+            <Color x:Key="CircularOverlayButtonBorderColor">#c0c0c0</Color>
+            <Color x:Key="Preview2DBackgroundColor">#1e1e1e</Color>
+            <Color x:Key="Preview2DMinorGridColor">#3a3a3a</Color>
+            <Color x:Key="Preview2DMajorGridColor">#4a4a4a</Color>
+            <Color x:Key="Preview2DAxisColor">#ffffff</Color>
             <SolidColorBrush x:Key="RibbonBackgroundBrush"
                              Color="{StaticResource RibbonBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonBorderBrush"
@@ -72,6 +80,16 @@
                              Color="{StaticResource GridSplitterColor}" />
             <SolidColorBrush x:Key="TabContentBorderBrush"
                              Color="{StaticResource TabContentBorderColor}" />
+            <SolidColorBrush x:Key="CircularOverlayButtonBorderBrush"
+                             Color="{StaticResource CircularOverlayButtonBorderColor}" />
+            <SolidColorBrush x:Key="Preview2DBackgroundBrush"
+                             Color="{StaticResource Preview2DBackgroundColor}" />
+            <SolidColorBrush x:Key="Preview2DMinorGridBrush"
+                             Color="{StaticResource Preview2DMinorGridColor}" />
+            <SolidColorBrush x:Key="Preview2DMajorGridBrush"
+                             Color="{StaticResource Preview2DMajorGridColor}" />
+            <SolidColorBrush x:Key="Preview2DAxisBrush"
+                             Color="{StaticResource Preview2DAxisColor}" />
           </ResourceDictionary>
 
           <!-- Fallback (used when ThemeVariant is Default) -->
@@ -85,6 +103,11 @@
             <Color x:Key="RibbonButtonPressedBackgroundColor">#ffe0e0e0</Color>
             <Color x:Key="GridSplitterColor">#666666</Color>
             <Color x:Key="TabContentBorderColor">#d0d6dd</Color>
+            <Color x:Key="CircularOverlayButtonBorderColor">#a0a0a0</Color>
+            <Color x:Key="Preview2DBackgroundColor">#ffffff</Color>
+            <Color x:Key="Preview2DMinorGridColor">#dcdcdc</Color>
+            <Color x:Key="Preview2DMajorGridColor">#c8c8c8</Color>
+            <Color x:Key="Preview2DAxisColor">#000000</Color>
             <SolidColorBrush x:Key="RibbonBackgroundBrush"
                              Color="{StaticResource RibbonBackgroundColor}" />
             <SolidColorBrush x:Key="RibbonBorderBrush"
@@ -103,6 +126,16 @@
                              Color="{StaticResource GridSplitterColor}" />
             <SolidColorBrush x:Key="TabContentBorderBrush"
                              Color="{StaticResource TabContentBorderColor}" />
+            <SolidColorBrush x:Key="CircularOverlayButtonBorderBrush"
+                             Color="{StaticResource CircularOverlayButtonBorderColor}" />
+            <SolidColorBrush x:Key="Preview2DBackgroundBrush"
+                             Color="{StaticResource Preview2DBackgroundColor}" />
+            <SolidColorBrush x:Key="Preview2DMinorGridBrush"
+                             Color="{StaticResource Preview2DMinorGridColor}" />
+            <SolidColorBrush x:Key="Preview2DMajorGridBrush"
+                             Color="{StaticResource Preview2DMajorGridColor}" />
+            <SolidColorBrush x:Key="Preview2DAxisBrush"
+                             Color="{StaticResource Preview2DAxisColor}" />
           </ResourceDictionary>
         </ResourceDictionary.ThemeDictionaries>
       </ResourceDictionary>
