@@ -10,35 +10,15 @@
     <!-- X Coordinate -->
     <StackPanel Spacing="4">
       <TextBlock Text="{Binding XLabelText}" FontWeight="SemiBold" />
-      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
-        <TextBox Grid.Column="0"
-                 Text="{Binding X, StringFormat='{}{0:F3}', Mode=TwoWay}"
-                 HorizontalAlignment="Stretch" />
-        <ToggleButton Grid.Column="1"
-                      IsChecked="{Binding IsXLocked, Mode=TwoWay}"
-                      Width="32"
-                      Height="32"
-                      ToolTip.Tip="Lock X coordinate">
-          <TextBlock Text="🔒" FontSize="14" />
-        </ToggleButton>
-      </Grid>
+      <TextBox Text="{Binding X, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
     </StackPanel>
 
     <!-- Y Coordinate -->
     <StackPanel Spacing="4">
       <TextBlock Text="{Binding YLabelText}" FontWeight="SemiBold" />
-      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
-        <TextBox Grid.Column="0"
-                 Text="{Binding Y, StringFormat='{}{0:F3}', Mode=TwoWay}"
-                 HorizontalAlignment="Stretch" />
-        <ToggleButton Grid.Column="1"
-                      IsChecked="{Binding IsYLocked, Mode=TwoWay}"
-                      Width="32"
-                      Height="32"
-                      ToolTip.Tip="Lock Y coordinate">
-          <TextBlock Text="🔒" FontSize="14" />
-        </ToggleButton>
-      </Grid>
+      <TextBox Text="{Binding Y, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
     </StackPanel>
   </StackPanel>
 </UserControl>

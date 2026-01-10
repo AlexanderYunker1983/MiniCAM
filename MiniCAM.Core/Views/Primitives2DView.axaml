@@ -30,7 +30,16 @@
                 IsEnabled="{Binding IsSelectionEnabled}">
         <TreeView.DataTemplates>
           <TreeDataTemplate ItemsSource="{Binding Children}"
-                            DataType="vm:Primitive2DItem">
+                            DataType="vm:Primitive2DItemViewModel">
+            <TextBlock Text="{Binding Name}" />
+          </TreeDataTemplate>
+          <TreeDataTemplate DataType="vm:Point2DViewModel">
+            <TextBlock Text="{Binding Name}" />
+          </TreeDataTemplate>
+          <TreeDataTemplate DataType="vm:Line2DViewModel">
+            <TextBlock Text="{Binding Name}" />
+          </TreeDataTemplate>
+          <TreeDataTemplate DataType="vm:Ellipse2DViewModel">
             <TextBlock Text="{Binding Name}" />
           </TreeDataTemplate>
           <TreeDataTemplate DataType="vm:Primitive2DChildItem">

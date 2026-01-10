@@ -348,6 +348,39 @@
   <data name="PrimitivePoint" xml:space="preserve">
     <value>Точка</value>
   </data>
+  <data name="ButtonLine" xml:space="preserve">
+    <value>Линия</value>
+  </data>
+  <data name="PrimitiveLine" xml:space="preserve">
+    <value>Линия</value>
+  </data>
+  <data name="ButtonEllipse" xml:space="preserve">
+    <value>Эллипс</value>
+  </data>
+  <data name="PrimitiveEllipse" xml:space="preserve">
+    <value>Эллипс</value>
+  </data>
+  <data name="PrimitivePropertyStart" xml:space="preserve">
+    <value>Начало</value>
+  </data>
+  <data name="PrimitivePropertyEnd" xml:space="preserve">
+    <value>Конец</value>
+  </data>
+  <data name="PrimitivePropertyCenter" xml:space="preserve">
+    <value>Центр</value>
+  </data>
+  <data name="PrimitivePropertyRadiusX" xml:space="preserve">
+    <value>Радиус X</value>
+  </data>
+  <data name="PrimitivePropertyRadiusY" xml:space="preserve">
+    <value>Радиус Y</value>
+  </data>
+  <data name="PrimitivePropertyRotation" xml:space="preserve">
+    <value>Поворот</value>
+  </data>
+  <data name="PrimitivePropertyLength" xml:space="preserve">
+    <value>Длина</value>
+  </data>
   <data name="ButtonGridSnap" xml:space="preserve">
     <value>Привязка к сетке</value>
   </data>

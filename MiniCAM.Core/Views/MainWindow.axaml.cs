@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Localization = MiniCAM.Core.Localization;
 
 namespace MiniCAM.Core.Views;
 

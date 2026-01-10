@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
+using MiniCAM.Core.ViewModels.Base;
 
 namespace MiniCAM.Core.ViewModels.Main;
 

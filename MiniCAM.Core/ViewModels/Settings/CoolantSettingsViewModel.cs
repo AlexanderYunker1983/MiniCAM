@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
+using MiniCAM.Core.ViewModels.Base;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings;
 
 /// <summary>
 /// View model for the Coolant settings tab.
@@ -26,7 +26,7 @@ public partial class CoolantSettingsViewModel : SettingsTabViewModelBase
     private bool _isCoolantSubOptionsEnabled;
 
     // Property headers dictionary for change tracking
-    private readonly Dictionary<string, PropertyHeaderViewModel> _headers = new();
+    private readonly Dictionary<string, Common.PropertyHeaderViewModel> _headers = new();
 
     private const string PropertyAddCoolantCode = nameof(AddCoolantCode);
     private const string PropertyEnableCoolantAtStart = nameof(EnableCoolantAtStart);
@@ -37,26 +37,26 @@ public partial class CoolantSettingsViewModel : SettingsTabViewModelBase
     /// <summary>
     /// Gets the header view model for AddCoolantCode property.
     /// </summary>
-    public PropertyHeaderViewModel CoolantAddCodeHeader => _headers[PropertyAddCoolantCode];
+    public Common.PropertyHeaderViewModel CoolantAddCodeHeader => _headers[PropertyAddCoolantCode];
 
     /// <summary>
     /// Gets the header view model for EnableCoolantAtStart property.
     /// </summary>
-    public PropertyHeaderViewModel CoolantEnableAtStartHeader => _headers[PropertyEnableCoolantAtStart];
+    public Common.PropertyHeaderViewModel CoolantEnableAtStartHeader => _headers[PropertyEnableCoolantAtStart];
 
     /// <summary>
     /// Gets the header view model for DisableCoolantAtEnd property.
     /// </summary>
-    public PropertyHeaderViewModel CoolantDisableAtEndHeader => _headers[PropertyDisableCoolantAtEnd];
+    public Common.PropertyHeaderViewModel CoolantDisableAtEndHeader => _headers[PropertyDisableCoolantAtEnd];
 
     public CoolantSettingsViewModel(ISettingsService settingsService)
     {
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         
         // Initialize headers
-        _headers[PropertyAddCoolantCode] = new PropertyHeaderViewModel(Resources.CoolantAddCode);
-        _headers[PropertyEnableCoolantAtStart] = new PropertyHeaderViewModel(Resources.CoolantEnableAtStart);
-        _headers[PropertyDisableCoolantAtEnd] = new PropertyHeaderViewModel(Resources.CoolantDisableAtEnd);
+        _headers[PropertyAddCoolantCode] = new Common.PropertyHeaderViewModel(Resources.CoolantAddCode);
+        _headers[PropertyEnableCoolantAtStart] = new Common.PropertyHeaderViewModel(Resources.CoolantEnableAtStart);
+        _headers[PropertyDisableCoolantAtEnd] = new Common.PropertyHeaderViewModel(Resources.CoolantDisableAtEnd);
         
         LoadFromSettings(_settingsService.Current);
         RegisterTrackedProperties();
@@ -69,9 +69,9 @@ public partial class CoolantSettingsViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterTrackedProperties()
     {
-        RegisterProperty(PropertyAddCoolantCode, AddCoolantCode, () => Resources.CoolantAddCode);
-        RegisterProperty(PropertyEnableCoolantAtStart, EnableCoolantAtStart, () => Resources.CoolantEnableAtStart);
-        RegisterProperty(PropertyDisableCoolantAtEnd, DisableCoolantAtEnd, () => Resources.CoolantDisableAtEnd);
+        RegisterProperty<bool>(PropertyAddCoolantCode, AddCoolantCode, () => Resources.CoolantAddCode);
+        RegisterProperty<bool>(PropertyEnableCoolantAtStart, EnableCoolantAtStart, () => Resources.CoolantEnableAtStart);
+        RegisterProperty<bool>(PropertyDisableCoolantAtEnd, DisableCoolantAtEnd, () => Resources.CoolantDisableAtEnd);
     }
 
     /// <summary>

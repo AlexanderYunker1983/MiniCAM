@@ -1,9 +1,9 @@
 using System;
-using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using MiniCAM.Core.Domain.Primitives;
 using MiniCAM.Core.Localization;
+using MiniCAM.Core.ViewModels.Base;
 
 namespace MiniCAM.Core.ViewModels.Main;
 
@@ -14,11 +14,12 @@ public partial class PointPropertiesViewModel : LocalizedViewModelBase
 {
     private Point2DPrimitive? _selectedPoint;
     private bool _isUpdatingFromPoint = false;
-    private bool _isCreatingPoint = false; // Flag to prevent re-entry during point creation
 
     public PointPropertiesViewModel()
     {
     }
+
+    private Point2DViewModel? _selectedPointViewModel;
 
     /// <summary>
     /// Selected point to display/edit properties for.
@@ -28,43 +29,65 @@ public partial class PointPropertiesViewModel : LocalizedViewModelBase
         get => _selectedPoint;
         set
         {
-            if (_selectedPoint != null)
+            // Unsubscribe from previous ViewModel
+            if (_selectedPointViewModel != null)
             {
-                _selectedPoint.PropertyChanged -= SelectedPoint_PropertyChanged;
+                _selectedPointViewModel.PropertyChanged -= SelectedPointViewModel_PropertyChanged;
             }
 
             _selectedPoint = value;
-
-            if (_selectedPoint != null)
+            
+            // Find corresponding ViewModel if point is selected
+            _selectedPointViewModel = null;
+            if (value != null)
             {
-                _selectedPoint.PropertyChanged += SelectedPoint_PropertyChanged;
-                UpdateFromPoint();
+                // Try to find ViewModel - this will be set from MainViewModel
+                // For now, we'll update from domain model directly
             }
-            else
-            {
-                // No point selected - use cursor position
-                UpdateFromPoint();
-            }
-
+            
+            UpdateFromPoint();
             OnPropertyChanged();
         }
     }
 
-    private void SelectedPoint_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    /// <summary>
+    /// Sets the selected point ViewModel for tracking changes.
+    /// </summary>
+    internal void SetSelectedPointViewModel(Point2DViewModel? viewModel)
+    {
+        // Unsubscribe from previous ViewModel
+        if (_selectedPointViewModel != null)
+        {
+            _selectedPointViewModel.PropertyChanged -= SelectedPointViewModel_PropertyChanged;
+        }
+
+        _selectedPointViewModel = viewModel;
+        _selectedPoint = viewModel?.Primitive as Point2DPrimitive;
+
+        // Subscribe to ViewModel changes
+        if (_selectedPointViewModel != null)
+        {
+            _selectedPointViewModel.PropertyChanged += SelectedPointViewModel_PropertyChanged;
+        }
+
+        UpdateFromPoint();
+    }
+
+    private void SelectedPointViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (_isUpdatingFromPoint) return;
 
-        // Update UI only if coordinate is not locked
-        if (e.PropertyName == nameof(Point2DPrimitive.X) && !IsXLocked)
+        // Update UI when ViewModel coordinates change
+        if (e.PropertyName == nameof(Point2DViewModel.X))
         {
             _isUpdatingFromPoint = true;
-            X = _selectedPoint?.X ?? 0;
+            X = _selectedPointViewModel?.X ?? 0;
             _isUpdatingFromPoint = false;
         }
-        else if (e.PropertyName == nameof(Point2DPrimitive.Y) && !IsYLocked)
+        else if (e.PropertyName == nameof(Point2DViewModel.Y))
         {
             _isUpdatingFromPoint = true;
-            Y = _selectedPoint?.Y ?? 0;
+            Y = _selectedPointViewModel?.Y ?? 0;
             _isUpdatingFromPoint = false;
         }
     }
@@ -75,27 +98,15 @@ public partial class PointPropertiesViewModel : LocalizedViewModelBase
         {
             // No point selected - use cursor position
             _isUpdatingFromPoint = true;
-            if (!IsXLocked)
-            {
-                X = CursorPosition.X;
-            }
-            if (!IsYLocked)
-            {
-                Y = CursorPosition.Y;
-            }
+            X = CursorPosition.X;
+            Y = CursorPosition.Y;
             _isUpdatingFromPoint = false;
             return;
         }
 
         _isUpdatingFromPoint = true;
-        if (!IsXLocked)
-        {
-            X = _selectedPoint.X;
-        }
-        if (!IsYLocked)
-        {
-            Y = _selectedPoint.Y;
-        }
+        X = _selectedPoint.X;
+        Y = _selectedPoint.Y;
         _isUpdatingFromPoint = false;
     }
 
@@ -105,18 +116,11 @@ public partial class PointPropertiesViewModel : LocalizedViewModelBase
     partial void OnCursorPositionChanged(Point value)
     {
         // Only update coordinates from cursor when no point is selected and in point mode
-        if (_selectedPoint == null && !_isUpdatingFromPoint && !_isCreatingPoint)
+        if (_selectedPoint == null && !_isUpdatingFromPoint)
         {
             _isUpdatingFromPoint = true;
-            // Update only unlocked coordinates - locked coordinates stay fixed
-            if (!IsXLocked)
-            {
-                X = value.X;
-            }
-            if (!IsYLocked)
-            {
-                Y = value.Y;
-            }
+            X = value.X;
+            Y = value.Y;
             _isUpdatingFromPoint = false;
         }
     }
@@ -127,42 +131,6 @@ public partial class PointPropertiesViewModel : LocalizedViewModelBase
     [ObservableProperty]
     private double _y;
 
-    private bool _isXLocked;
-    
-    public bool IsXLocked
-    {
-        get => _isXLocked;
-        set
-        {
-            if (SetProperty(ref _isXLocked, value))
-            {
-                // Only call partial method if not creating point
-                if (!_isCreatingPoint)
-                {
-                    OnIsXLockedChanged(value);
-                }
-            }
-        }
-    }
-
-    private bool _isYLocked;
-    
-    public bool IsYLocked
-    {
-        get => _isYLocked;
-        set
-        {
-            if (SetProperty(ref _isYLocked, value))
-            {
-                // Only call partial method if not creating point
-                if (!_isCreatingPoint)
-                {
-                    OnIsYLockedChanged(value);
-                }
-            }
-        }
-    }
-
     [ObservableProperty]
     private string _xLabelText = Resources.CoordinateX;
 
@@ -171,7 +139,7 @@ public partial class PointPropertiesViewModel : LocalizedViewModelBase
 
     partial void OnXChanged(double value)
     {
-        if (_isUpdatingFromPoint || _isCreatingPoint) return;
+        if (_isUpdatingFromPoint) return;
 
         // If point is selected, update it when user manually changes value
         if (_selectedPoint != null)
@@ -185,7 +153,7 @@ public partial class PointPropertiesViewModel : LocalizedViewModelBase
 
     partial void OnYChanged(double value)
     {
-        if (_isUpdatingFromPoint || _isCreatingPoint) return;
+        if (_isUpdatingFromPoint) return;
 
         // If point is selected, update it when user manually changes value
         if (_selectedPoint != null)
@@ -197,59 +165,6 @@ public partial class PointPropertiesViewModel : LocalizedViewModelBase
         }
     }
 
-    private void OnIsXLockedChanged(bool value)
-    {
-        if (value)
-        {
-            // X is now locked
-            // Check if Y is also locked - if so, create point
-            if (IsYLocked && _selectedPoint == null)
-            {
-                CreatePointAndResetLocks();
-            }
-        }
-    }
-
-    private void OnIsYLockedChanged(bool value)
-    {
-        if (value)
-        {
-            // Y is now locked
-            // Check if X is also locked - if so, create point
-            if (IsXLocked && _selectedPoint == null)
-            {
-                CreatePointAndResetLocks();
-            }
-        }
-    }
-
-    private void CreatePointAndResetLocks()
-    {
-        if (_isCreatingPoint) return; // Prevent re-entry
-        
-        // Set flag FIRST to prevent any handlers from processing
-        _isCreatingPoint = true;
-        
-        // Save coordinates before resetting locks
-        var x = X;
-        var y = Y;
-        
-        // Raise event to create point
-        PointCreatedFromLock?.Invoke(x, y);
-        
-        // Reset locks - the flag prevents OnIsXLockedChanged and OnIsYLockedChanged from being called
-        // SetProperty will update the UI but won't call our custom handlers
-        IsXLocked = false;
-        IsYLocked = false;
-        
-        // Reset flag after properties are updated
-        _isCreatingPoint = false;
-    }
-    
-    /// <summary>
-    /// Event raised when both coordinates are locked and point should be created.
-    /// </summary>
-    public event Action<double, double>? PointCreatedFromLock;
 
     protected override void UpdateLocalizedStrings()
     {

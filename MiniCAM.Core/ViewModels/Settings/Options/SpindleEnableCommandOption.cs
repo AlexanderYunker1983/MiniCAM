@@ -1,9 +1,9 @@
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings.Options;
 
 /// <summary>
 /// Represents a spindle enable command option (M3, M4).
 /// </summary>
-public partial class SpindleEnableCommandOption : OptionBase
+public partial class SpindleEnableCommandOption : Common.OptionBase
 {
     /// <summary>
     /// Initializes a new instance of the SpindleEnableCommandOption class.

@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Media;
 using Avalonia.Threading;
-using MiniCAM.Core.Localization;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Common;
 
 /// <summary>
 /// Tracks property changes and manages header text and font style for each property.

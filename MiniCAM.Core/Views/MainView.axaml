@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MiniCAM.Core.ViewModels"
              xmlns:views="clr-namespace:MiniCAM.Core.Views"
+             xmlns:main="clr-namespace:MiniCAM.Core.ViewModels.Main"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MiniCAM.Core.Views.MainView"
-             x:DataType="vm:MainViewModel">
+             x:DataType="main:MainViewModel">
   <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
+    <main:MainViewModel />
   </Design.DataContext>
 
   <UserControl.Resources>
@@ -44,6 +45,10 @@
             <StackPanel Orientation="Horizontal" Spacing="8">
               <ToggleButton Content="{Binding PointButtonText}"
                            IsChecked="{Binding IsPointModeActive, Mode=TwoWay}" />
+              <ToggleButton Content="{Binding LineButtonText}"
+                           IsChecked="{Binding IsLineModeActive, Mode=TwoWay}" />
+              <ToggleButton Content="{Binding EllipseButtonText}"
+                           IsChecked="{Binding IsEllipseModeActive, Mode=TwoWay}" />
             </StackPanel>
           </Border>
         </TabItem>
@@ -65,7 +70,7 @@
         <ColumnDefinition Width="{Binding RightPanelWidth}" />
       </Grid.ColumnDefinitions>
 
-      <!-- Left column: Operation properties / Point properties -->
+      <!-- Left column: Operation properties / Primitive properties -->
       <Border Grid.Column="0"
               Margin="4"
               Padding="0"
@@ -73,7 +78,7 @@
               BorderBrush="{DynamicResource ThemeBorderLowBrush}"
               IsVisible="{Binding IsLeftPanelVisible}">
         <Grid>
-          <!-- Show point properties when point mode is active and point is selected -->
+          <!-- Show point properties when point mode is active or point is selected -->
           <ContentControl Content="{Binding PointPropertiesViewModel}"
                          IsVisible="{Binding IsPointPropertiesVisible}">
             <ContentControl.ContentTemplate>
@@ -82,12 +87,33 @@
               </DataTemplate>
             </ContentControl.ContentTemplate>
           </ContentControl>
-          <!-- Show default text when not showing point properties -->
+          
+          <!-- Show line properties when line is selected -->
+          <ContentControl Content="{Binding LinePropertiesViewModel}"
+                         IsVisible="{Binding IsLinePropertiesVisible}">
+            <ContentControl.ContentTemplate>
+              <DataTemplate>
+                <views:LinePropertiesView />
+              </DataTemplate>
+            </ContentControl.ContentTemplate>
+          </ContentControl>
+          
+          <!-- Show ellipse properties when ellipse is selected -->
+          <ContentControl Content="{Binding EllipsePropertiesViewModel}"
+                         IsVisible="{Binding IsEllipsePropertiesVisible}">
+            <ContentControl.ContentTemplate>
+              <DataTemplate>
+                <views:EllipsePropertiesView />
+              </DataTemplate>
+            </ContentControl.ContentTemplate>
+          </ContentControl>
+          
+          <!-- Show default text when not showing any properties -->
           <TextBlock Text="{Binding OperationPropertiesText}"
                      HorizontalAlignment="Center"
                      VerticalAlignment="Center"
                      Margin="8"
-                     IsVisible="{Binding !IsPointPropertiesVisible}" />
+                     IsVisible="{Binding IsAnyPrimitivePropertiesVisible, Converter={x:Static BoolConverters.Not}}" />
         </Grid>
       </Border>
 

@@ -3,15 +3,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:MiniCAM.Core.ViewModels"
+        xmlns:settings="clr-namespace:MiniCAM.Core.ViewModels.Settings"
+        xmlns:options="clr-namespace:MiniCAM.Core.ViewModels.Settings.Options"
         x:Class="MiniCAM.Core.Views.CodeGenerationSettingsWindow"
-        x:DataType="vm:CodeGenerationSettingsViewModel"
+        x:DataType="settings:CodeGenerationSettingsViewModel"
         mc:Ignorable="d"
         Width="500"
         Height="400"
         CanResize="True"
         WindowStartupLocation="CenterOwner">
   <Design.DataContext>
-    <vm:CodeGenerationSettingsViewModel />
+    <settings:CodeGenerationSettingsViewModel />
   </Design.DataContext>
   <Window.Resources>
     <ResourceDictionary>
@@ -108,7 +110,7 @@
                             SelectedItem="{Binding SelectedCoordinateSystem, Mode=TwoWay}"
                             HorizontalAlignment="Stretch">
                     <ComboBox.ItemTemplate>
-                      <DataTemplate x:DataType="vm:CoordinateSystemOption">
+                      <DataTemplate x:DataType="options:CoordinateSystemOption">
                         <TextBlock Text="{Binding DisplayName}" />
                       </DataTemplate>
                     </ComboBox.ItemTemplate>
@@ -257,7 +259,7 @@
                             SelectedItem="{Binding SelectedSpindleEnableCommand, Mode=TwoWay}"
                             HorizontalAlignment="Stretch">
                     <ComboBox.ItemTemplate>
-                      <DataTemplate x:DataType="vm:SpindleEnableCommandOption">
+                      <DataTemplate x:DataType="options:SpindleEnableCommandOption">
                         <TextBlock Text="{Binding DisplayName}" />
                       </DataTemplate>
                     </ComboBox.ItemTemplate>
@@ -279,7 +281,7 @@
                               SelectedItem="{Binding SelectedSpindleDelayParameter, Mode=TwoWay}"
                               HorizontalAlignment="Stretch">
                       <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:SpindleDelayParameterOption">
+                        <DataTemplate x:DataType="options:SpindleDelayParameterOption">
                           <TextBlock Text="{Binding DisplayName}" />
                         </DataTemplate>
                       </ComboBox.ItemTemplate>

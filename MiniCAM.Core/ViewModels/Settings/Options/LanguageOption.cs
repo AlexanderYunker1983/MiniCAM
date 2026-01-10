@@ -1,9 +1,9 @@
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings.Options;
 
 /// <summary>
 /// Represents a language/culture option for application localization.
 /// </summary>
-public partial class LanguageOption : OptionBase
+public partial class LanguageOption : Common.OptionBase
 {
     /// <summary>
     /// Gets the culture name (alias for Key for backward compatibility).

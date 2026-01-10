@@ -1,7 +1,6 @@
 using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,8 +8,8 @@ using Microsoft.Extensions.Logging;
 using MiniCAM.Core.Settings;
 using Avalonia.Markup.Xaml;
 using MiniCAM.Core.Localization;
-using MiniCAM.Core.ViewModels;
 using MiniCAM.Core.Views;
+using MainViewModel = MiniCAM.Core.ViewModels.Main.MainViewModel;
 
 namespace MiniCAM.Core;
 
@@ -34,7 +33,7 @@ public partial class App : Application
         // Register settings service with logging
         serviceCollection.AddSingleton<ISettingsService>(sp =>
         {
-            var logger = sp.GetService<Microsoft.Extensions.Logging.ILogger<SettingsService>>();
+            var logger = sp.GetService<ILogger<SettingsService>>();
             return new SettingsService(logger);
         });
         

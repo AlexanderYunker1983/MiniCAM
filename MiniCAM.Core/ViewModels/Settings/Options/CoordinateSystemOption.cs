@@ -1,9 +1,9 @@
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings.Options;
 
 /// <summary>
 /// Represents a work coordinate system option (G54-G59).
 /// </summary>
-public partial class CoordinateSystemOption : OptionBase
+public partial class CoordinateSystemOption : Common.OptionBase
 {
     /// <summary>
     /// Initializes a new instance of the CoordinateSystemOption class.

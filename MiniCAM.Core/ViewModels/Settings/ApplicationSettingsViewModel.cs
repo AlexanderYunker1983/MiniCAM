@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
+using MiniCAM.Core.ViewModels.Base;
+using MiniCAM.Core.ViewModels.Settings.Options;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings;
 
 /// <summary>
 /// View model for the Application Settings window.
@@ -39,17 +40,17 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
     private string _themeLabel = Resources.ThemeLabel;
 
     // Property headers dictionary for change tracking
-    private readonly Dictionary<string, PropertyHeaderViewModel> _headers = new();
+    private readonly Dictionary<string, Common.PropertyHeaderViewModel> _headers = new();
 
     /// <summary>
     /// Gets the header view model for language property.
     /// </summary>
-    public PropertyHeaderViewModel LanguageHeader => _headers[PropertyLanguage];
+    public Common.PropertyHeaderViewModel LanguageHeader => _headers[PropertyLanguage];
 
     /// <summary>
     /// Gets the header view model for theme property.
     /// </summary>
-    public PropertyHeaderViewModel ThemeHeader => _headers[PropertyTheme];
+    public Common.PropertyHeaderViewModel ThemeHeader => _headers[PropertyTheme];
 
     [ObservableProperty]
     private string _applyButtonText = Resources.ButtonApply;
@@ -62,8 +63,8 @@ public partial class ApplicationSettingsViewModel : SettingsTabViewModelBase
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         
         // Initialize headers
-        _headers[PropertyLanguage] = new PropertyHeaderViewModel(Resources.LanguageLabel);
-        _headers[PropertyTheme] = new PropertyHeaderViewModel(Resources.ThemeLabel);
+        _headers[PropertyLanguage] = new Common.PropertyHeaderViewModel(Resources.LanguageLabel);
+        _headers[PropertyTheme] = new Common.PropertyHeaderViewModel(Resources.ThemeLabel);
         
         BuildLanguages();
         BuildThemes();

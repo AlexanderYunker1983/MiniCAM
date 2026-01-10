@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Common;
 
 /// <summary>
 /// Helper class for managing collections of Option items with automatic display name updates.

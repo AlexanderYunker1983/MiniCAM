@@ -1,9 +1,8 @@
 using System;
 using Avalonia.Controls;
-using Localization = MiniCAM.Core.Localization;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
-using MiniCAM.Core.ViewModels;
+using CodeGenerationSettingsViewModel = MiniCAM.Core.ViewModels.Settings.CodeGenerationSettingsViewModel;
 
 namespace MiniCAM.Core.Views;
 
@@ -50,7 +49,7 @@ public partial class CodeGenerationSettingsWindow : Window
         }
     }
 
-    private void OnClosed(object? sender, System.EventArgs e)
+    private void OnClosed(object? sender, EventArgs e)
     {
         Localization.Resources.CultureChanged -= OnCultureChanged;
         if (DataContext is CodeGenerationSettingsViewModel viewModel)

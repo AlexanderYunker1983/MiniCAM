@@ -1,8 +1,7 @@
 using System;
-using CommunityToolkit.Mvvm.ComponentModel;
 using MiniCAM.Core.Localization;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Base;
 
 /// <summary>
 /// Base class for view models that need localization support.

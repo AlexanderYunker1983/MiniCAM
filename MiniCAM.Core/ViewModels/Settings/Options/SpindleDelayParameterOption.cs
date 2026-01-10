@@ -1,9 +1,9 @@
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings.Options;
 
 /// <summary>
 /// Represents a spindle delay parameter option (F, P, Pxx.).
 /// </summary>
-public partial class SpindleDelayParameterOption : OptionBase
+public partial class SpindleDelayParameterOption : Common.OptionBase
 {
     /// <summary>
     /// Initializes a new instance of the SpindleDelayParameterOption class.

@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using MiniCAM.Core.ViewModels;
 using MiniCAM.Core.ViewModels.Main;
+using MainViewModel = MiniCAM.Core.ViewModels.Main.MainViewModel;
 
 namespace MiniCAM.Core.Views;
 
@@ -54,7 +54,12 @@ public partial class Preview2DView : UserControl
             }
         }
         
-        if (mainViewModel?.IsPointModeActive == true)
+        // Handle cursor cross and coordinates display for all creation modes
+        var isInCreationMode = mainViewModel?.IsPointModeActive == true || 
+                              mainViewModel?.IsLineModeActive == true || 
+                              mainViewModel?.IsEllipseModeActive == true;
+        
+        if (isInCreationMode && mainViewModel != null)
         {
             var mousePos = e.GetPosition(this);
             var worldPos = vm.ScreenToWorld(e.GetPosition(PreviewControl));
@@ -64,8 +69,11 @@ public partial class Preview2DView : UserControl
             var keyModifiers = e.KeyModifiers;
             var shouldObjectSnap = ShouldObjectSnap(mainViewModel.IsObjectSnapEnabled, keyModifiers.HasFlag(KeyModifiers.Control));
             
-            Point2DPrimitive? snappedXPoint = null;
-            Point2DPrimitive? snappedYPoint = null;
+            Domain.Primitives.Point2DPrimitive? snappedXPoint = null;
+            Domain.Primitives.Point2DPrimitive? snappedYPoint = null;
+            
+            Point? snappedXCoords = null;
+            Point? snappedYCoords = null;
             
             if (shouldObjectSnap)
             {
@@ -73,6 +81,12 @@ public partial class Preview2DView : UserControl
                 worldPos = snapResult.snappedPoint;
                 snappedXPoint = snapResult.snappedXPoint;
                 snappedYPoint = snapResult.snappedYPoint;
+                snappedXCoords = snapResult.snappedXPointCoords.HasValue 
+                    ? new Point(snapResult.snappedXPointCoords.Value.X, snapResult.snappedXPointCoords.Value.Y) 
+                    : null;
+                snappedYCoords = snapResult.snappedYPointCoords.HasValue 
+                    ? new Point(snapResult.snappedYPointCoords.Value.X, snapResult.snappedYPointCoords.Value.Y) 
+                    : null;
             }
             
             // Apply grid snapping based on button state and Shift key
@@ -83,60 +97,39 @@ public partial class Preview2DView : UserControl
                 worldPos = SnapToGrid(worldPos, mainViewModel.GridSnapStep);
             }
             
-            // Apply coordinate locks from point properties
-            var pointProps = mainViewModel.PointPropertiesViewModel;
-            if (pointProps.IsXLocked)
-            {
-                worldPos = new Point(pointProps.X, worldPos.Y);
-            }
-            if (pointProps.IsYLocked)
-            {
-                worldPos = new Point(worldPos.X, pointProps.Y);
-            }
             
-            // Re-apply snapping after locks (if coordinates were changed by locks)
-            if (pointProps.IsXLocked || pointProps.IsYLocked)
+            // Constrain third ellipse point to orthogonal line (only in ellipse mode when center and major axis are set)
+            if (mainViewModel.IsEllipseModeActive && 
+                mainViewModel.EllipseCenter.HasValue && 
+                mainViewModel.EllipseMajorAxisPoint.HasValue)
             {
-                // Re-apply object snapping if enabled
-                if (shouldObjectSnap)
-                {
-                    var snapResult = SnapToObjects(worldPos, mainViewModel, vm);
-                    // Only apply snapping to unlocked coordinates
-                    if (!pointProps.IsXLocked)
-                    {
-                        worldPos = new Point(snapResult.snappedPoint.X, worldPos.Y);
-                        snappedXPoint = snapResult.snappedXPoint;
-                    }
-                    if (!pointProps.IsYLocked)
-                    {
-                        worldPos = new Point(worldPos.X, snapResult.snappedPoint.Y);
-                        snappedYPoint = snapResult.snappedYPoint;
-                    }
-                }
+                var center = mainViewModel.EllipseCenter.Value;
+                var rotationAngle = mainViewModel.EllipseRotationAngle;
                 
-                // Re-apply grid snapping if enabled
-                if (shouldSnap)
-                {
-                    var snapped = SnapToGrid(worldPos, mainViewModel.GridSnapStep);
-                    if (!pointProps.IsXLocked)
-                    {
-                        worldPos = new Point(snapped.X, worldPos.Y);
-                    }
-                    if (!pointProps.IsYLocked)
-                    {
-                        worldPos = new Point(worldPos.X, snapped.Y);
-                    }
-                }
+                // Calculate orthogonal vector to major axis (rotate 90 degrees)
+                var majorAxisDirection = new Domain.Geometry.Vector2D(Math.Cos(rotationAngle), Math.Sin(rotationAngle));
+                var orthogonalVector = new Domain.Geometry.Vector2D(-majorAxisDirection.Y, majorAxisDirection.X);
+                
+                // Project cursor position onto orthogonal line
+                var cursorVector = new Domain.Geometry.Vector2D(
+                    worldPos.X - center.X,
+                    worldPos.Y - center.Y);
+                var projectionLength = cursorVector.X * orthogonalVector.X + cursorVector.Y * orthogonalVector.Y;
+                
+                // Calculate constrained point on orthogonal line
+                var constrainedPoint = center + orthogonalVector * projectionLength;
+                worldPos = new Point(constrainedPoint.X, constrainedPoint.Y);
             }
             
             // Store snap info for drawing
             PreviewControl?.SetObjectSnapInfo(snappedXPoint, snappedYPoint, worldPos);
+            PreviewControl?.SetObjectSnapInfoWithCoords(snappedXCoords, snappedYCoords, worldPos);
             PreviewControl?.InvalidateVisual(); // Ensure visual is invalidated after setting snap info
             
             _coordinatesText.Text = $"X: {worldPos.X:F3}; Y: {worldPos.Y:F3}";
             
-            // Update point properties view model with cursor position (only unlocked coordinates)
-            if (mainViewModel.PointPropertiesViewModel.SelectedPoint == null)
+            // Update point properties view model with cursor position (only in point mode)
+            if (mainViewModel.IsPointModeActive && mainViewModel.PointPropertiesViewModel.SelectedPoint == null)
             {
                 mainViewModel.PointPropertiesViewModel.CursorPosition = worldPos;
             }
@@ -157,6 +150,7 @@ public partial class Preview2DView : UserControl
             if (!e.GetCurrentPoint(PreviewControl).Properties.IsLeftButtonPressed)
             {
                 PreviewControl?.SetObjectSnapInfo(null, null, default);
+                PreviewControl?.SetObjectSnapInfoWithCoords(null, null, default);
                 PreviewControl?.InvalidateVisual(); // Ensure visual is invalidated after clearing snap info
             }
             if (_tooltip.IsVisible)
@@ -180,50 +174,112 @@ public partial class Preview2DView : UserControl
         }
     }
 
-    private (Point snappedPoint, Point2DPrimitive? snappedXPoint, Point2DPrimitive? snappedYPoint) SnapToObjects(Point worldPoint, MainViewModel mainViewModel, Preview2DViewModel vm)
+    /// <summary>
+    /// Gets all snap points from all primitives (point primitives, line endpoints, ellipse centers).
+    /// </summary>
+    private List<(Domain.Geometry.Point2D Point, Domain.Primitives.Primitive2D? SourcePrimitive)> GetAllSnapPoints(MainViewModel mainViewModel)
+    {
+        var snapPoints = new List<(Domain.Geometry.Point2D, Domain.Primitives.Primitive2D?)>();
+        
+        foreach (var primitiveViewModel in mainViewModel.Primitives2DViewModel.Primitives)
+        {
+            var primitive = primitiveViewModel.Primitive;
+            
+            if (primitive is Domain.Primitives.Point2DPrimitive point)
+            {
+                snapPoints.Add((new Domain.Geometry.Point2D(point.X, point.Y), primitive));
+            }
+            else if (primitive is Domain.Primitives.Line2DPrimitive line)
+            {
+                // Add start and end points of the line
+                snapPoints.Add((line.Start, primitive));
+                snapPoints.Add((line.End, primitive));
+            }
+            else if (primitive is Domain.Primitives.Ellipse2DPrimitive ellipse)
+            {
+                // Add center point of the ellipse
+                snapPoints.Add((ellipse.Center, primitive));
+            }
+        }
+        
+        return snapPoints;
+    }
+
+    private (Point snappedPoint, Domain.Primitives.Point2DPrimitive? snappedXPoint, Domain.Primitives.Point2DPrimitive? snappedYPoint, Domain.Geometry.Point2D? snappedXPointCoords, Domain.Geometry.Point2D? snappedYPointCoords) SnapToObjects(Point worldPoint, MainViewModel mainViewModel, Preview2DViewModel vm)
     {
         const double snapTolerance = 5.0; // pixels tolerance for snapping
         var toleranceWorld = snapTolerance / vm.Zoom; // Convert to world coordinates
         
-        Point2DPrimitive? nearestXPoint = null;
-        Point2DPrimitive? nearestYPoint = null;
+        Domain.Geometry.Point2D? nearestXPoint = null;
+        Domain.Geometry.Point2D? nearestYPoint = null;
         double minXDistance = toleranceWorld;
         double minYDistance = toleranceWorld;
         
+        var worldPosScreen = vm.WorldToScreen(worldPoint);
+        
+        // Get all snap points (from point primitives, line endpoints, ellipse centers)
+        var snapPoints = GetAllSnapPoints(mainViewModel);
+        
         // Find nearest points on X and Y axes
-        foreach (var primitive in mainViewModel.Primitives2DViewModel.Primitives)
+        foreach (var (snapPoint, _) in snapPoints)
         {
-            if (primitive is Point2DPrimitive point)
+            // Convert snap point to screen coordinates
+            var pointScreen = vm.WorldToScreen(new Point(snapPoint.X, snapPoint.Y));
+            
+            // Check distance in screen pixels
+            var distanceXScreen = Math.Abs(pointScreen.X - worldPosScreen.X);
+            var distanceYScreen = Math.Abs(pointScreen.Y - worldPosScreen.Y);
+            
+            // Check if point is close enough on X axis (within 5 pixels)
+            if (distanceXScreen <= snapTolerance && distanceXScreen < minXDistance * vm.Zoom)
             {
-                // Convert object point to screen coordinates
-                var pointScreen = vm.WorldToScreen(new Point(point.X, point.Y));
-                var worldPosScreen = vm.WorldToScreen(worldPoint);
-                
-                // Check distance in screen pixels
-                var distanceXScreen = Math.Abs(pointScreen.X - worldPosScreen.X);
-                var distanceYScreen = Math.Abs(pointScreen.Y - worldPosScreen.Y);
-                
-                // Check if point is close enough on X axis (within 5 pixels)
-                if (distanceXScreen <= snapTolerance && distanceXScreen < minXDistance * vm.Zoom)
-                {
-                    minXDistance = Math.Abs(point.X - worldPoint.X);
-                    nearestXPoint = point;
-                }
-                
-                // Check if point is close enough on Y axis (within 5 pixels)
-                if (distanceYScreen <= snapTolerance && distanceYScreen < minYDistance * vm.Zoom)
-                {
-                    minYDistance = Math.Abs(point.Y - worldPoint.Y);
-                    nearestYPoint = point;
-                }
+                minXDistance = Math.Abs(snapPoint.X - worldPoint.X);
+                nearestXPoint = snapPoint;
+            }
+            
+            // Check if point is close enough on Y axis (within 5 pixels)
+            if (distanceYScreen <= snapTolerance && distanceYScreen < minYDistance * vm.Zoom)
+            {
+                minYDistance = Math.Abs(snapPoint.Y - worldPoint.Y);
+                nearestYPoint = snapPoint;
             }
         }
         
         // Apply snapping
-        var snappedX = nearestXPoint != null ? nearestXPoint.X : worldPoint.X;
-        var snappedY = nearestYPoint != null ? nearestYPoint.Y : worldPoint.Y;
+        var snappedX = nearestXPoint.HasValue ? nearestXPoint.Value.X : worldPoint.X;
+        var snappedY = nearestYPoint.HasValue ? nearestYPoint.Value.Y : worldPoint.Y;
         
-        return (new Point(snappedX, snappedY), nearestXPoint, nearestYPoint);
+        // Convert back to Point2DPrimitive for compatibility (find the source primitive if it exists)
+        Domain.Primitives.Point2DPrimitive? snappedXPointPrimitive = null;
+        Domain.Primitives.Point2DPrimitive? snappedYPointPrimitive = null;
+        
+        if (nearestXPoint.HasValue)
+        {
+            // Try to find the source point primitive
+            foreach (var (snapPoint, sourcePrimitive) in snapPoints)
+            {
+                if (snapPoint.X == nearestXPoint.Value.X && snapPoint.Y == nearestXPoint.Value.Y && sourcePrimitive is Domain.Primitives.Point2DPrimitive pointPrim)
+                {
+                    snappedXPointPrimitive = pointPrim;
+                    break;
+                }
+            }
+        }
+        
+        if (nearestYPoint.HasValue)
+        {
+            // Try to find the source point primitive
+            foreach (var (snapPoint, sourcePrimitive) in snapPoints)
+            {
+                if (snapPoint.X == nearestYPoint.Value.X && snapPoint.Y == nearestYPoint.Value.Y && sourcePrimitive is Domain.Primitives.Point2DPrimitive pointPrim)
+                {
+                    snappedYPointPrimitive = pointPrim;
+                    break;
+                }
+            }
+        }
+        
+        return (new Point(snappedX, snappedY), snappedXPointPrimitive, snappedYPointPrimitive, nearestXPoint, nearestYPoint);
     }
 
     private bool ShouldSnapToGrid(bool isGridSnapEnabled, bool isShiftPressed)
@@ -276,27 +332,38 @@ public partial class Preview2DView : UserControl
             PreviewControl.MainViewModel = mainViewModel;
         }
         
-        // Subscribe to IsPointModeActive changes to update cursor
+        // Subscribe to creation mode changes to update cursor
         if (mainViewModel != null)
         {
             mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-            UpdateCursor(mainViewModel.IsPointModeActive);
+            var isInCreationMode = mainViewModel.IsPointModeActive || 
+                                  mainViewModel.IsLineModeActive || 
+                                  mainViewModel.IsEllipseModeActive;
+            UpdateCursor(isInCreationMode);
         }
     }
 
     private void MainViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.IsPointModeActive) && sender is MainViewModel mainViewModel)
+        if (sender is MainViewModel mainViewModel)
         {
-            UpdateCursor(mainViewModel.IsPointModeActive);
+            if (e.PropertyName == nameof(MainViewModel.IsPointModeActive) ||
+                e.PropertyName == nameof(MainViewModel.IsLineModeActive) ||
+                e.PropertyName == nameof(MainViewModel.IsEllipseModeActive))
+            {
+                var isInCreationMode = mainViewModel.IsPointModeActive || 
+                                      mainViewModel.IsLineModeActive || 
+                                      mainViewModel.IsEllipseModeActive;
+                UpdateCursor(isInCreationMode);
+            }
         }
     }
 
-    private void UpdateCursor(bool isPointModeActive)
+    private void UpdateCursor(bool isInCreationMode)
     {
-        // Hide cursor in point mode, show default cursor otherwise
+        // Hide cursor in any creation mode (point, line, ellipse), show default cursor otherwise
         // Set cursor on both Preview2DView and PreviewControl for better compatibility
-        var cursor = isPointModeActive ? new Cursor(StandardCursorType.None) : Cursor.Default;
+        var cursor = isInCreationMode ? new Cursor(StandardCursorType.None) : Cursor.Default;
         Cursor = cursor;
         if (PreviewControl != null)
         {
@@ -329,7 +396,7 @@ public partial class Preview2DView : UserControl
     private MainViewModel? GetMainViewModel()
     {
         // Find MainViewModel in the visual tree
-        var parent = this.Parent;
+        var parent = Parent;
         while (parent != null)
         {
             if (parent is Control control && control.DataContext is MainViewModel mainVm)

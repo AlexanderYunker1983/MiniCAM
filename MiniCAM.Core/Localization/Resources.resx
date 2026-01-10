@@ -289,6 +289,39 @@
   <data name="PrimitivePoint" xml:space="preserve">
     <value>Point</value>
   </data>
+  <data name="ButtonLine" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="PrimitiveLine" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="ButtonEllipse" xml:space="preserve">
+    <value>Ellipse</value>
+  </data>
+  <data name="PrimitiveEllipse" xml:space="preserve">
+    <value>Ellipse</value>
+  </data>
+  <data name="PrimitivePropertyStart" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="PrimitivePropertyEnd" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="PrimitivePropertyCenter" xml:space="preserve">
+    <value>Center</value>
+  </data>
+  <data name="PrimitivePropertyRadiusX" xml:space="preserve">
+    <value>Radius X</value>
+  </data>
+  <data name="PrimitivePropertyRadiusY" xml:space="preserve">
+    <value>Radius Y</value>
+  </data>
+  <data name="PrimitivePropertyRotation" xml:space="preserve">
+    <value>Rotation</value>
+  </data>
+  <data name="PrimitivePropertyLength" xml:space="preserve">
+    <value>Length</value>
+  </data>
   <data name="ButtonGridSnap" xml:space="preserve">
     <value>Grid Snap</value>
   </data>

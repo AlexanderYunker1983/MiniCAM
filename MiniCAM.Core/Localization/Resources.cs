@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Resources;
-using MiniCAM.Core.Settings;
 
 namespace MiniCAM.Core.Localization;
 
@@ -176,6 +175,17 @@ public static class Resources
     public static string Primitives2D => GetString(nameof(Primitives2D), "2D Primitives");
     public static string ButtonPoint => GetString(nameof(ButtonPoint), "Point");
     public static string PrimitivePoint => GetString(nameof(PrimitivePoint), "Point");
+    public static string ButtonLine => GetString(nameof(ButtonLine), "Line");
+    public static string PrimitiveLine => GetString(nameof(PrimitiveLine), "Line");
+    public static string ButtonEllipse => GetString(nameof(ButtonEllipse), "Ellipse");
+    public static string PrimitiveEllipse => GetString(nameof(PrimitiveEllipse), "Ellipse");
+    public static string PrimitivePropertyStart => GetString(nameof(PrimitivePropertyStart), "Start");
+    public static string PrimitivePropertyEnd => GetString(nameof(PrimitivePropertyEnd), "End");
+    public static string PrimitivePropertyCenter => GetString(nameof(PrimitivePropertyCenter), "Center");
+    public static string PrimitivePropertyRadiusX => GetString(nameof(PrimitivePropertyRadiusX), "Radius X");
+    public static string PrimitivePropertyRadiusY => GetString(nameof(PrimitivePropertyRadiusY), "Radius Y");
+    public static string PrimitivePropertyRotation => GetString(nameof(PrimitivePropertyRotation), "Rotation");
+    public static string PrimitivePropertyLength => GetString(nameof(PrimitivePropertyLength), "Length");
     public static string ButtonGridSnap => GetString(nameof(ButtonGridSnap), "Grid Snap");
     public static string ButtonObjectSnap => GetString(nameof(ButtonObjectSnap), "Object Snap");
     public static string CoordinateX => GetString(nameof(CoordinateX), "X");

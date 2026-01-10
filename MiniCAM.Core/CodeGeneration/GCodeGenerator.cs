@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using MiniCAM.Core.Domain.Operations;
+using MiniCAM.Core.Domain.ToolPath;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
 using MiniCAM.Core.Settings.Models;
-using MiniCAM.Core.ViewModels;
 
 namespace MiniCAM.Core.CodeGeneration;
 
@@ -41,9 +42,9 @@ public class GCodeGenerator
     /// <summary>
     /// Generates G-code from the list of operations.
     /// </summary>
-    /// <param name="operations">List of operations to generate G-code for.</param>
+    /// <param name="operations">List of operation ViewModels to generate G-code for.</param>
     /// <returns>List of G-code lines.</returns>
-    public List<string> Generate(IEnumerable<OperationItem> operations)
+    public List<string> Generate(IEnumerable<ViewModels.Main.OperationItemViewModel> operations)
     {
         var result = new List<string>();
         _currentLineNumber = GetStartLineNumber();
@@ -52,8 +53,11 @@ public class GCodeGenerator
         // Initialize current position (after G92 if set)
         ResetCurrentPosition();
 
-        // Filter enabled operations
-        var enabledOperations = operations.Where(op => op.IsEnabled).ToList();
+        // Filter enabled operations and get domain operations
+        var enabledOperations = operations
+            .Where(op => op.IsEnabled)
+            .Select(op => op.Operation)
+            .ToList();
 
         // Program header - ALWAYS without line numbers
         if (_codeGenSettings.GenerateComments == true)
@@ -72,9 +76,16 @@ public class GCodeGenerator
         GenerateProgramStart(result);
 
         // Generate G-code for each operation
+        var operationParameters = new OperationParameters
+        {
+            SafeHeight = 10.0, // Default safe height
+            DefaultFeedRate = 100.0, // Default feed rate
+            RapidFeedRate = 1000.0 // Default rapid feed rate
+        };
+
         foreach (var operation in enabledOperations)
         {
-            GenerateOperationCode(result, operation);
+            GenerateOperationCode(result, operation, operationParameters);
         }
 
         // Generate program end commands
@@ -107,7 +118,7 @@ public class GCodeGenerator
         if (string.IsNullOrWhiteSpace(value))
             return null;
         
-        if (double.TryParse(value, System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
+        if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
             return result;
         
         return null;
@@ -248,7 +259,7 @@ public class GCodeGenerator
         }
     }
 
-    private void GenerateOperationCode(List<string> result, OperationItem operation)
+    private void GenerateOperationCode(List<string> result, CamOperation operation, OperationParameters parameters)
     {
         // Add comment for operation if comments are enabled
         if (_codeGenSettings.GenerateComments == true)
@@ -256,10 +267,94 @@ public class GCodeGenerator
             AddLine(result, $"; {operation.Name}");
         }
 
-        // Placeholder implementation - in real scenario, this would generate actual G-code
-        // based on operation type and parameters
-        AddLine(result, FormatCommand("G90")); // Absolute positioning
-        AddMoveCommand(result, FormatCommand("G0"), "0", "0", "0"); // Rapid move to origin
+        // Generate tool path from operation
+        var toolPath = operation.GenerateToolPath(parameters);
+
+        // Convert tool path segments to G-code
+        foreach (var segment in toolPath.Segments)
+        {
+            GenerateMoveCommand(result, segment);
+        }
+    }
+
+    private void GenerateMoveCommand(List<string> result, ToolPathSegment segment)
+    {
+        var command = segment.Command;
+        string gcodeCommand;
+
+        // Determine G-code command based on move type
+        switch (command.Type)
+        {
+            case MoveType.Rapid:
+                gcodeCommand = FormatCommand("G0");
+                break;
+            case MoveType.Linear:
+                gcodeCommand = FormatCommand("G1");
+                break;
+            case MoveType.ArcCW:
+                gcodeCommand = FormatCommand("G2");
+                break;
+            case MoveType.ArcCCW:
+                gcodeCommand = FormatCommand("G3");
+                break;
+            default:
+                gcodeCommand = FormatCommand("G1"); // Default to linear
+                break;
+        }
+
+        // Use end point from segment for coordinates
+        var endPoint = segment.EndPoint;
+        
+        // Build coordinate string - only include coordinates that changed
+        var coordinates = new List<string>();
+        if (command.X.HasValue && !AreCoordinatesEqual(_currentX, (double?)endPoint.X))
+        {
+            coordinates.Add($"X{FormatCoordinate(endPoint.X)}");
+            _currentX = endPoint.X;
+        }
+        if (command.Y.HasValue && !AreCoordinatesEqual(_currentY, (double?)endPoint.Y))
+        {
+            coordinates.Add($"Y{FormatCoordinate(endPoint.Y)}");
+            _currentY = endPoint.Y;
+        }
+        if (command.Z.HasValue && !AreCoordinatesEqual(_currentZ, (double?)endPoint.Z))
+        {
+            coordinates.Add($"Z{FormatCoordinate(endPoint.Z)}");
+            _currentZ = endPoint.Z;
+        }
+
+        // Add arc parameters if present
+        if (command.I.HasValue)
+        {
+            coordinates.Add($"I{FormatCoordinate(command.I.Value)}");
+        }
+        if (command.J.HasValue)
+        {
+            coordinates.Add($"J{FormatCoordinate(command.J.Value)}");
+        }
+        if (command.K.HasValue)
+        {
+            coordinates.Add($"K{FormatCoordinate(command.K.Value)}");
+        }
+        if (command.R.HasValue)
+        {
+            coordinates.Add($"R{FormatCoordinate(command.R.Value)}");
+        }
+
+        // Add feed rate for linear and arc movements
+        if (command.FeedRate.HasValue && (command.Type == MoveType.Linear || command.Type == MoveType.ArcCW || command.Type == MoveType.ArcCCW))
+        {
+            coordinates.Add($"F{command.FeedRate.Value:F0}");
+        }
+
+        // Build the complete G-code line
+        var line = gcodeCommand;
+        if (coordinates.Count > 0)
+        {
+            line += " " + string.Join(" ", coordinates);
+            AddLine(result, line);
+        }
+        // If no coordinates changed, skip the command (position already correct)
     }
 
     private void GenerateProgramEnd(List<string> result)

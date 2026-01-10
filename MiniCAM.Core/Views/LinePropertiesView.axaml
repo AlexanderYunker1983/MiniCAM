@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MiniCAM.Core.ViewModels.Main"
+             x:Class="MiniCAM.Core.Views.LinePropertiesView"
+             x:DataType="vm:LinePropertiesViewModel"
+             mc:Ignorable="d">
+  <StackPanel Spacing="12" Margin="8">
+    <!-- Start Point -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding StartXLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding StartX, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding StartYLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding StartY, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+
+    <!-- End Point -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding EndXLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding EndX, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding EndYLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding EndY, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+
+    <!-- Length (read-only) -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding LengthLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding Length, StringFormat='{}{0:F3}'}"
+               IsReadOnly="True"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

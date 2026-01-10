@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using MiniCAM.Core.ViewModels;
+using ApplicationSettingsViewModel = MiniCAM.Core.ViewModels.Settings.ApplicationSettingsViewModel;
 
 namespace MiniCAM.Core.Views;
 

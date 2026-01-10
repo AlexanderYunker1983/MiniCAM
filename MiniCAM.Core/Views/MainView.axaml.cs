@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
-using MiniCAM.Core.ViewModels;
+using MainViewModel = MiniCAM.Core.ViewModels.Main.MainViewModel;
 
 namespace MiniCAM.Core.Views;
 

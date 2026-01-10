@@ -1,9 +1,9 @@
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings.Options;
 
 /// <summary>
 /// Represents a theme option for application appearance.
 /// </summary>
-public partial class ThemeOption : OptionBase
+public partial class ThemeOption : Common.OptionBase
 {
     /// <summary>
     /// Initializes a new instance of the ThemeOption class.

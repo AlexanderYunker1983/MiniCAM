@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
+using MiniCAM.Core.ViewModels.Base;
+using MiniCAM.Core.ViewModels.Common;
+using MiniCAM.Core.ViewModels.Settings.Options;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings;
 
 /// <summary>
 /// View model for the Code Generation settings tab.
@@ -189,9 +190,9 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterLineNumberProperties()
     {
-        RegisterProperty(PropertyUseLineNumbers, UseLineNumbers, () => Resources.CodeGenUseLineNumbers);
-        RegisterProperty(PropertyStartLineNumber, StartLineNumber, () => Resources.CodeGenStartLineNumber);
-        RegisterProperty(PropertyLineNumberStep, LineNumberStep, () => Resources.CodeGenLineNumberStep);
+        RegisterProperty<bool>(PropertyUseLineNumbers, UseLineNumbers, () => Resources.CodeGenUseLineNumbers);
+        RegisterProperty<string>(PropertyStartLineNumber, StartLineNumber, () => Resources.CodeGenStartLineNumber);
+        RegisterProperty<string>(PropertyLineNumberStep, LineNumberStep, () => Resources.CodeGenLineNumberStep);
     }
 
     /// <summary>
@@ -199,9 +200,9 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterGeneralCodeGenerationProperties()
     {
-        RegisterProperty(PropertyGenerateComments, GenerateComments, () => Resources.CodeGenGenerateComments);
-        RegisterProperty(PropertyAllowArcs, AllowArcs, () => Resources.CodeGenAllowArcs);
-        RegisterProperty(PropertyFormatCommands, FormatCommands, () => Resources.CodeGenFormatCommands);
+        RegisterProperty<bool>(PropertyGenerateComments, GenerateComments, () => Resources.CodeGenGenerateComments);
+        RegisterProperty<bool>(PropertyAllowArcs, AllowArcs, () => Resources.CodeGenAllowArcs);
+        RegisterProperty<bool>(PropertyFormatCommands, FormatCommands, () => Resources.CodeGenFormatCommands);
     }
 
     /// <summary>
@@ -209,10 +210,10 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterCoordinateSystemProperties()
     {
-        RegisterProperty(PropertySetWorkCoordinateSystem, SetWorkCoordinateSystem, () => Resources.CodeGenSetWorkCoordinateSystem);
+        RegisterProperty<bool>(PropertySetWorkCoordinateSystem, SetWorkCoordinateSystem, () => Resources.CodeGenSetWorkCoordinateSystem);
         HeaderTracker.Register(
             PropertyCoordinateSystem,
-            SelectedCoordinateSystem?.Key ?? Settings.CoordinateSystems.Default,
+            SelectedCoordinateSystem?.Key ?? Core.Settings.CoordinateSystems.Default,
             () => Resources.CodeGenCoordinateSystemLabel,
             _headers[PropertyCoordinateSystem]);
     }
@@ -222,9 +223,9 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterCoordinateModeProperties()
     {
-        RegisterProperty(PropertySetAbsoluteCoordinates, SetAbsoluteCoordinates, () => Resources.CodeGenSetAbsoluteCoordinates);
-        RegisterProperty(PropertyAllowRelativeCoordinates, AllowRelativeCoordinates, () => Resources.CodeGenAllowRelativeCoordinates);
-        RegisterProperty(PropertySetZerosAtStart, SetZerosAtStart, () => Resources.CodeGenSetZerosAtStart);
+        RegisterProperty<bool>(PropertySetAbsoluteCoordinates, SetAbsoluteCoordinates, () => Resources.CodeGenSetAbsoluteCoordinates);
+        RegisterProperty<bool>(PropertyAllowRelativeCoordinates, AllowRelativeCoordinates, () => Resources.CodeGenAllowRelativeCoordinates);
+        RegisterProperty<bool>(PropertySetZerosAtStart, SetZerosAtStart, () => Resources.CodeGenSetZerosAtStart);
     }
 
     /// <summary>
@@ -232,9 +233,9 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterInitialPositionProperties()
     {
-        RegisterProperty(PropertyX0, X0, () => Resources.CodeGenX0);
-        RegisterProperty(PropertyY0, Y0, () => Resources.CodeGenY0);
-        RegisterProperty(PropertyZ0, Z0, () => Resources.CodeGenZ0);
+        RegisterProperty<string>(PropertyX0, X0, () => Resources.CodeGenX0);
+        RegisterProperty<string>(PropertyY0, Y0, () => Resources.CodeGenY0);
+        RegisterProperty<string>(PropertyZ0, Z0, () => Resources.CodeGenZ0);
     }
 
     /// <summary>
@@ -242,10 +243,10 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterEndPositionProperties()
     {
-        RegisterProperty(PropertyMoveToPointAtEnd, MoveToPointAtEnd, () => Resources.CodeGenMoveToPointAtEnd);
-        RegisterProperty(PropertyX, X, () => Resources.CodeGenX);
-        RegisterProperty(PropertyY, Y, () => Resources.CodeGenY);
-        RegisterProperty(PropertyZ, Z, () => Resources.CodeGenZ);
+        RegisterProperty<bool>(PropertyMoveToPointAtEnd, MoveToPointAtEnd, () => Resources.CodeGenMoveToPointAtEnd);
+        RegisterProperty<string>(PropertyX, X, () => Resources.CodeGenX);
+        RegisterProperty<string>(PropertyY, Y, () => Resources.CodeGenY);
+        RegisterProperty<string>(PropertyZ, Z, () => Resources.CodeGenZ);
     }
 
     /// <summary>
@@ -253,7 +254,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterDecimalPlacesProperty()
     {
-        RegisterProperty(PropertyDecimalPlaces, DecimalPlaces, () => Resources.CodeGenDecimalPlaces);
+        RegisterProperty<string>(PropertyDecimalPlaces, DecimalPlaces, () => Resources.CodeGenDecimalPlaces);
     }
 
     /// <summary>
@@ -277,12 +278,12 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
     {
         _coordinateSystemsHelper.Clear();
         _coordinateSystemsHelper
-            .Add(Settings.CoordinateSystems.G54, () => Resources.CodeGenCoordinateSystemG54, (k, d) => new CoordinateSystemOption(k, d))
-            .Add(Settings.CoordinateSystems.G55, () => Resources.CodeGenCoordinateSystemG55, (k, d) => new CoordinateSystemOption(k, d))
-            .Add(Settings.CoordinateSystems.G56, () => Resources.CodeGenCoordinateSystemG56, (k, d) => new CoordinateSystemOption(k, d))
-            .Add(Settings.CoordinateSystems.G57, () => Resources.CodeGenCoordinateSystemG57, (k, d) => new CoordinateSystemOption(k, d))
-            .Add(Settings.CoordinateSystems.G58, () => Resources.CodeGenCoordinateSystemG58, (k, d) => new CoordinateSystemOption(k, d))
-            .Add(Settings.CoordinateSystems.G59, () => Resources.CodeGenCoordinateSystemG59, (k, d) => new CoordinateSystemOption(k, d));
+            .Add(Core.Settings.CoordinateSystems.G54, () => Resources.CodeGenCoordinateSystemG54, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Core.Settings.CoordinateSystems.G55, () => Resources.CodeGenCoordinateSystemG55, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Core.Settings.CoordinateSystems.G56, () => Resources.CodeGenCoordinateSystemG56, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Core.Settings.CoordinateSystems.G57, () => Resources.CodeGenCoordinateSystemG57, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Core.Settings.CoordinateSystems.G58, () => Resources.CodeGenCoordinateSystemG58, (k, d) => new CoordinateSystemOption(k, d))
+            .Add(Core.Settings.CoordinateSystems.G59, () => Resources.CodeGenCoordinateSystemG59, (k, d) => new CoordinateSystemOption(k, d));
     }
 
     private void UpdateCoordinateSystemDisplayNames()
@@ -387,7 +388,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
 
     partial void OnSelectedCoordinateSystemChanged(CoordinateSystemOption? value)
     {
-        HeaderTracker.Update(PropertyCoordinateSystem, value?.Key ?? Settings.CoordinateSystems.Default);
+        HeaderTracker.Update(PropertyCoordinateSystem, value?.Key ?? Core.Settings.CoordinateSystems.Default);
     }
 
     /// <summary>
@@ -411,9 +412,9 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         LoadBoolProperty(settings, s => s.FormatCommands, CodeGenerationDefaults.FormatCommands, PropertyFormatCommands, v => FormatCommands = v);
         LoadBoolProperty(settings, s => s.SetWorkCoordinateSystem, CodeGenerationDefaults.SetWorkCoordinateSystem, PropertySetWorkCoordinateSystem, v => SetWorkCoordinateSystem = v);
         
-        var coordinateSystem = LoadStringProperty(settings, s => s.CoordinateSystem, Settings.CoordinateSystems.Default, PropertyCoordinateSystem, _ => { });
+        var coordinateSystem = LoadStringProperty(settings, s => s.CoordinateSystem, Core.Settings.CoordinateSystems.Default, PropertyCoordinateSystem, _ => { });
         SelectedCoordinateSystem = _coordinateSystemsHelper.FindByKey(coordinateSystem)
-                                   ?? _coordinateSystemsHelper.FindByKey(Settings.CoordinateSystems.Default);
+                                   ?? _coordinateSystemsHelper.FindByKey(Core.Settings.CoordinateSystems.Default);
         
         LoadBoolProperty(settings, s => s.SetAbsoluteCoordinates, CodeGenerationDefaults.SetAbsoluteCoordinates, PropertySetAbsoluteCoordinates, v => SetAbsoluteCoordinates = v);
         LoadBoolProperty(settings, s => s.AllowRelativeCoordinates, CodeGenerationDefaults.AllowRelativeCoordinates, PropertyAllowRelativeCoordinates, v => AllowRelativeCoordinates = v);
@@ -429,7 +430,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         // Load DecimalPlaces as int, convert to string for UI
         var decimalPlaces = settings.DecimalPlaces ?? CodeGenerationDefaults.DecimalPlaces;
         DecimalPlaces = decimalPlaces.ToString();
-        HeaderTracker.Update(PropertyDecimalPlaces, DecimalPlaces);
+        HeaderTracker.Update<string>(PropertyDecimalPlaces, DecimalPlaces);
     }
 
     public override void SaveToSettings(AppSettings settings)
@@ -441,7 +442,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         settings.AllowArcs = AllowArcs;
         settings.FormatCommands = FormatCommands;
         settings.SetWorkCoordinateSystem = SetWorkCoordinateSystem;
-        settings.CoordinateSystem = SelectedCoordinateSystem?.Key ?? Settings.CoordinateSystems.Default;
+        settings.CoordinateSystem = SelectedCoordinateSystem?.Key ?? Core.Settings.CoordinateSystems.Default;
         settings.SetAbsoluteCoordinates = SetAbsoluteCoordinates;
         settings.AllowRelativeCoordinates = AllowRelativeCoordinates;
         settings.SetZerosAtStart = SetZerosAtStart;
@@ -454,7 +455,7 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         settings.Z = Z;
         
         // Save DecimalPlaces as int, parse from string
-        if (int.TryParse(DecimalPlaces, out var decimalPlaces))
+        if (int.TryParse((string?)DecimalPlaces, out var decimalPlaces))
         {
             settings.DecimalPlaces = decimalPlaces;
         }
@@ -474,9 +475,9 @@ public partial class CodeGenerationTabViewModel : SettingsTabViewModelBase
         ResetBoolProperty(PropertyFormatCommands, CodeGenerationDefaults.FormatCommands, v => FormatCommands = v);
         ResetBoolProperty(PropertySetWorkCoordinateSystem, CodeGenerationDefaults.SetWorkCoordinateSystem, v => SetWorkCoordinateSystem = v);
         
-        var originalCoordinateSystem = ResetStringProperty(PropertyCoordinateSystem, Settings.CoordinateSystems.Default, _ => { });
+        var originalCoordinateSystem = ResetStringProperty(PropertyCoordinateSystem, Core.Settings.CoordinateSystems.Default, _ => { });
         SelectedCoordinateSystem = _coordinateSystemsHelper.FindByKey(originalCoordinateSystem)
-                                   ?? _coordinateSystemsHelper.FindByKey(Settings.CoordinateSystems.Default);
+                                   ?? _coordinateSystemsHelper.FindByKey(Core.Settings.CoordinateSystems.Default);
         
         ResetBoolProperty(PropertySetAbsoluteCoordinates, CodeGenerationDefaults.SetAbsoluteCoordinates, v => SetAbsoluteCoordinates = v);
         ResetBoolProperty(PropertyAllowRelativeCoordinates, CodeGenerationDefaults.AllowRelativeCoordinates, v => AllowRelativeCoordinates = v);

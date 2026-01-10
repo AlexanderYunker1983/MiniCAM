@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MiniCAM.Core.ViewModels.Main"
+             x:Class="MiniCAM.Core.Views.EllipsePropertiesView"
+             x:DataType="vm:EllipsePropertiesViewModel"
+             mc:Ignorable="d">
+  <StackPanel Spacing="12" Margin="8">
+    <!-- Center -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding CenterXLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding CenterX, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding CenterYLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding CenterY, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+
+    <!-- Radius X -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding RadiusXLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding RadiusX, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+
+    <!-- Radius Y -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding RadiusYLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding RadiusY, StringFormat='{}{0:F3}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+
+    <!-- Rotation Angle -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding RotationLabelText}" FontWeight="SemiBold" />
+      <TextBox Text="{Binding RotationAngleDegrees, StringFormat='{}{0:F1}', Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

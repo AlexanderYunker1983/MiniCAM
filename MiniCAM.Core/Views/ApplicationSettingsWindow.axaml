@@ -3,8 +3,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:MiniCAM.Core.ViewModels"
+        xmlns:settings="clr-namespace:MiniCAM.Core.ViewModels.Settings"
+        xmlns:options="clr-namespace:MiniCAM.Core.ViewModels.Settings.Options"
         x:Class="MiniCAM.Core.Views.ApplicationSettingsWindow"
-        x:DataType="vm:ApplicationSettingsViewModel"
+        x:DataType="settings:ApplicationSettingsViewModel"
         mc:Ignorable="d"
         Width="360"
         SizeToContent="Height"
@@ -12,7 +14,7 @@
         WindowStartupLocation="CenterOwner"
         Title="{Binding WindowTitle}">
   <Design.DataContext>
-    <vm:ApplicationSettingsViewModel />
+    <settings:ApplicationSettingsViewModel />
   </Design.DataContext>
 
   <Border Padding="16" Background="{DynamicResource ThemeBackgroundBrush}">
@@ -28,7 +30,7 @@
                   SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
                   HorizontalAlignment="Stretch">
           <ComboBox.ItemTemplate>
-            <DataTemplate x:DataType="vm:LanguageOption">
+            <DataTemplate x:DataType="options:LanguageOption">
               <TextBlock Text="{Binding DisplayName}" />
             </DataTemplate>
           </ComboBox.ItemTemplate>
@@ -42,7 +44,7 @@
                   SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
                   HorizontalAlignment="Stretch">
           <ComboBox.ItemTemplate>
-            <DataTemplate x:DataType="vm:ThemeOption">
+            <DataTemplate x:DataType="options:ThemeOption">
               <TextBlock Text="{Binding DisplayName}" />
             </DataTemplate>
           </ComboBox.ItemTemplate>

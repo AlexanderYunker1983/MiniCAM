@@ -3,8 +3,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
+using MiniCAM.Core.ViewModels.Base;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings;
 
 /// <summary>
 /// Main coordinator ViewModel for code generation settings window.

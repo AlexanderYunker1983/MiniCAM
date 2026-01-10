@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
+using MiniCAM.Core.ViewModels.Base;
+using MiniCAM.Core.ViewModels.Common;
+using MiniCAM.Core.ViewModels.Settings.Options;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Settings;
 
 /// <summary>
 /// View model for the Spindle settings tab.
@@ -131,9 +132,9 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterBasicSpindleProperties()
     {
-        RegisterProperty(PropertyAddSpindleCode, AddSpindleCode, () => Resources.SpindleAddCode);
-        RegisterProperty(PropertySetSpindleSpeed, SetSpindleSpeed, () => Resources.SpindleSetSpeed);
-        RegisterProperty(PropertySpindleSpeed, SpindleSpeed, () => Resources.SpindleSpeedLabel);
+        RegisterProperty<bool>(PropertyAddSpindleCode, AddSpindleCode, () => Resources.SpindleAddCode);
+        RegisterProperty<bool>(PropertySetSpindleSpeed, SetSpindleSpeed, () => Resources.SpindleSetSpeed);
+        RegisterProperty<string>(PropertySpindleSpeed, SpindleSpeed, () => Resources.SpindleSpeedLabel);
     }
 
     /// <summary>
@@ -141,13 +142,13 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterSpindleEnableDisableProperties()
     {
-        RegisterProperty(PropertyEnableSpindleBeforeOperations, EnableSpindleBeforeOperations, () => Resources.SpindleEnableBeforeOperations);
+        RegisterProperty<bool>(PropertyEnableSpindleBeforeOperations, EnableSpindleBeforeOperations, () => Resources.SpindleEnableBeforeOperations);
         HeaderTracker.Register(
             PropertySpindleEnableCommand,
             SelectedSpindleEnableCommand?.Key ?? SpindleCommands.DefaultEnableCommand,
             () => Resources.SpindleEnableCommandLabel,
             _headers[PropertySpindleEnableCommand]);
-        RegisterProperty(PropertyDisableSpindleAfterOperations, DisableSpindleAfterOperations, () => Resources.SpindleDisableAfterOperations);
+        RegisterProperty<bool>(PropertyDisableSpindleAfterOperations, DisableSpindleAfterOperations, () => Resources.SpindleDisableAfterOperations);
     }
 
     /// <summary>
@@ -155,13 +156,13 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
     /// </summary>
     private void RegisterSpindleDelayProperties()
     {
-        RegisterProperty(PropertyAddSpindleDelayAfterEnable, AddSpindleDelayAfterEnable, () => Resources.SpindleAddDelayAfterEnable);
+        RegisterProperty<bool>(PropertyAddSpindleDelayAfterEnable, AddSpindleDelayAfterEnable, () => Resources.SpindleAddDelayAfterEnable);
         HeaderTracker.Register(
             PropertySpindleDelayParameter,
-            SelectedSpindleDelayParameter?.Key ?? Settings.SpindleDelayParameters.Default,
+            SelectedSpindleDelayParameter?.Key ?? Core.Settings.SpindleDelayParameters.Default,
             () => Resources.SpindleDelayParameterLabel,
             _headers[PropertySpindleDelayParameter]);
-        RegisterProperty(PropertySpindleDelayValue, SpindleDelayValue, () => Resources.SpindleDelayValueLabel);
+        RegisterProperty<string>(PropertySpindleDelayValue, SpindleDelayValue, () => Resources.SpindleDelayValueLabel);
     }
 
     /// <summary>
@@ -197,9 +198,9 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
     {
         _spindleDelayParametersHelper.Clear();
         _spindleDelayParametersHelper
-            .Add(Settings.SpindleDelayParameters.F, () => Resources.SpindleDelayParameterF, (k, d) => new SpindleDelayParameterOption(k, d))
-            .Add(Settings.SpindleDelayParameters.P, () => Resources.SpindleDelayParameterP, (k, d) => new SpindleDelayParameterOption(k, d))
-            .Add(Settings.SpindleDelayParameters.Pxx, () => Resources.SpindleDelayParameterPxx, (k, d) => new SpindleDelayParameterOption(k, d));
+            .Add(Core.Settings.SpindleDelayParameters.F, () => Resources.SpindleDelayParameterF, (k, d) => new SpindleDelayParameterOption(k, d))
+            .Add(Core.Settings.SpindleDelayParameters.P, () => Resources.SpindleDelayParameterP, (k, d) => new SpindleDelayParameterOption(k, d))
+            .Add(Core.Settings.SpindleDelayParameters.Pxx, () => Resources.SpindleDelayParameterPxx, (k, d) => new SpindleDelayParameterOption(k, d));
     }
 
     private void UpdateSpindleEnableCommandDisplayNames()
@@ -268,7 +269,7 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
 
     partial void OnSelectedSpindleDelayParameterChanged(SpindleDelayParameterOption? value)
     {
-        HeaderTracker.Update(PropertySpindleDelayParameter, value?.Key ?? Settings.SpindleDelayParameters.Default);
+        HeaderTracker.Update(PropertySpindleDelayParameter, value?.Key ?? Core.Settings.SpindleDelayParameters.Default);
     }
 
     /// <summary>
@@ -315,9 +316,9 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
         
         LoadBoolProperty(settings, s => s.AddSpindleDelayAfterEnable, SpindleDefaults.AddSpindleDelayAfterEnable, PropertyAddSpindleDelayAfterEnable, v => AddSpindleDelayAfterEnable = v);
         
-        var spindleDelayParameter = LoadStringProperty(settings, s => s.SpindleDelayParameter, Settings.SpindleDelayParameters.Default, PropertySpindleDelayParameter, _ => { });
+        var spindleDelayParameter = LoadStringProperty(settings, s => s.SpindleDelayParameter, Core.Settings.SpindleDelayParameters.Default, PropertySpindleDelayParameter, _ => { });
         SelectedSpindleDelayParameter = _spindleDelayParametersHelper.FindByKey(spindleDelayParameter)
-                                       ?? _spindleDelayParametersHelper.FindByKey(Settings.SpindleDelayParameters.Default);
+                                       ?? _spindleDelayParametersHelper.FindByKey(Core.Settings.SpindleDelayParameters.Default);
         
         LoadStringProperty(settings, s => s.SpindleDelayValue, SpindleDefaults.DelayValue, PropertySpindleDelayValue, v => SpindleDelayValue = v);
         LoadBoolProperty(settings, s => s.DisableSpindleAfterOperations, SpindleDefaults.DisableSpindleAfterOperations, PropertyDisableSpindleAfterOperations, v => DisableSpindleAfterOperations = v);
@@ -331,7 +332,7 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
         settings.EnableSpindleBeforeOperations = EnableSpindleBeforeOperations;
         settings.SpindleEnableCommand = SelectedSpindleEnableCommand?.Key ?? SpindleCommands.DefaultEnableCommand;
         settings.AddSpindleDelayAfterEnable = AddSpindleDelayAfterEnable;
-        settings.SpindleDelayParameter = SelectedSpindleDelayParameter?.Key ?? Settings.SpindleDelayParameters.Default;
+        settings.SpindleDelayParameter = SelectedSpindleDelayParameter?.Key ?? Core.Settings.SpindleDelayParameters.Default;
         settings.SpindleDelayValue = SpindleDelayValue;
         settings.DisableSpindleAfterOperations = DisableSpindleAfterOperations;
     }
@@ -349,9 +350,9 @@ public partial class SpindleSettingsViewModel : SettingsTabViewModelBase
         
         ResetBoolProperty(PropertyAddSpindleDelayAfterEnable, SpindleDefaults.AddSpindleDelayAfterEnable, v => AddSpindleDelayAfterEnable = v);
         
-        var originalParameter = ResetStringProperty(PropertySpindleDelayParameter, Settings.SpindleDelayParameters.Default, _ => { });
+        var originalParameter = ResetStringProperty(PropertySpindleDelayParameter, Core.Settings.SpindleDelayParameters.Default, _ => { });
         SelectedSpindleDelayParameter = _spindleDelayParametersHelper.FindByKey(originalParameter)
-                                       ?? _spindleDelayParametersHelper.FindByKey(Settings.SpindleDelayParameters.Default);
+                                       ?? _spindleDelayParametersHelper.FindByKey(Core.Settings.SpindleDelayParameters.Default);
         
         ResetStringProperty(PropertySpindleDelayValue, SpindleDefaults.DelayValue, v => SpindleDelayValue = v);
         ResetBoolProperty(PropertyDisableSpindleAfterOperations, SpindleDefaults.DisableSpindleAfterOperations, v => DisableSpindleAfterOperations = v);

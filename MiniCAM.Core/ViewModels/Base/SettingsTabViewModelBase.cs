@@ -1,11 +1,11 @@
 using System;
 using System.Linq.Expressions;
 using Avalonia.Media;
-using CommunityToolkit.Mvvm.ComponentModel;
 using MiniCAM.Core.Localization;
 using MiniCAM.Core.Settings;
+using MiniCAM.Core.ViewModels.Common;
 
-namespace MiniCAM.Core.ViewModels;
+namespace MiniCAM.Core.ViewModels.Base;
 
 /// <summary>
 /// Base class for settings tab view models with change tracking support.
